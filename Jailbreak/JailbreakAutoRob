@@ -1,0 +1,8 @@
+_G.console = true -- true, false
+_G.consolerainbowtext = true -- true, false (Oxygen U not supported)
+_G.instantcartp = true -- true, false (Plane, bank, jewelry, powerplant and museum)
+_G.cooldown = 3 -- number
+_G.cartpmethod = "Velocity" -- Velocity, Tween
+_G.cartpheight = 1000 -- number
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Minhseu123/Scripts/main/Jailbreak/thisnotascriptskiddo"))()
