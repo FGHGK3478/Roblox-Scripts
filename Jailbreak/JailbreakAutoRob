@@ -1,3 +1,5 @@
+-- currently not working
+
 _G.console = true -- true, false
 _G.consolerainbowtext = true -- true, false (Oxygen U not supported)
 _G.instantcartp = true -- true, false (Plane, bank, jewelry, powerplant and museum)
