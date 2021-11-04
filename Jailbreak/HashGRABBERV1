@@ -1,0 +1,46 @@
+-- More hashes coming soon
+
+local hashes
+local hashes1 = {}
+for i,v in pairs(getgc(true)) do
+    if hashes then
+        break
+    end
+    if type(v) == "table" then
+        for k2,v2 in pairs(v) do
+            if type(v2) == "string" and v2:sub(1,1) == "!" and #v2 == 37 then
+                hashes = v
+            end
+        end
+    end
+end
+
+local i = 0
+for k,v in pairs(hashes) do
+    i += 1
+    if i == 124 then
+        hashes1["Enter Vehicle"] = k
+    elseif i == 59 then
+        hashes1["Spawn Vehicle"] = k
+    elseif i == 62 then
+        hashes1["Shoot Vehicle"] = k
+    elseif i == 1 then
+        hashes1["Change Team"] = k
+    elseif i == 91 then
+        hashes1["Arrest Player"] = k
+    elseif i == 104 then
+        hashes1["Buy Item"] = k
+    elseif i == 33 then
+        hashes1["Remove Item"] = k
+    elseif i == 66 then
+        hashes1["Give Item"] = k
+    elseif i == 60 then
+        hashes1["Eject Vehicle"] = k
+    elseif i == 45 then
+        hashes1["Tase"] = k
+    elseif i == 55 then
+        hashes1["Attach Crate"] = k
+    end
+end
+
+return hashes1
