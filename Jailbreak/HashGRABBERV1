@@ -40,15 +40,15 @@ for k,v in pairs(hashes) do
     elseif i == 51 then
     	hashes1["Grid"] = k
     elseif i == 40 then
-    	hashes1["GiveDonut"] = k
+    	hashes1["Give Donut"] = k
     elseif i == 103 then
-    	hashes1["EatDonut"] = k
+    	hashes1["Eat Donut"] = k
     elseif i == 100 then
-    	hashes1["OpenSafe"] = k
+    	hashes1["Open Safe"] = k
     elseif i == 98 then
-    	hashes1["BuySafe"] = k
+    	hashes1["Buy Safe"] = k
     elseif i == 64 then
-    	hashes1["SendSafe"] = k
+    	hashes1["Send Safe"] = k
     end
 end
 
