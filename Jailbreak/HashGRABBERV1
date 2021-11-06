@@ -1,4 +1,4 @@
--- Added Grid, Send Safe, Buy Safe, SendSafe, Give Donut and Eat Donut
+-- Added Grid, Open Safe, Buy Safe, SendSafe, Give Donut and Eat Donut
 
 local hashes
 local hashes1 = {}
