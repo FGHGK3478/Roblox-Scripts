@@ -1,11 +1,8 @@
--- More hashes coming soon
+-- Added Grid, Send Safe, Buy Safe, SendSafe, Give Donut and Eat Donut
 
 local hashes
 local hashes1 = {}
 for i,v in pairs(getgc(true)) do
-    if hashes then
-        break
-    end
     if type(v) == "table" then
         for k2,v2 in pairs(v) do
             if type(v2) == "string" and v2:sub(1,1) == "!" and #v2 == 37 then
@@ -40,6 +37,18 @@ for k,v in pairs(hashes) do
         hashes1["Tase"] = k
     elseif i == 55 then
         hashes1["Attach Crate"] = k
+    elseif i == 51 then
+    	hashes1["Grid"] = k
+    elseif i == 40 then
+    	hashes1["GiveDonut"] = k
+    elseif i == 103 then
+    	hashes1["EatDonut"] = k
+    elseif i == 100 then
+    	hashes1["OpenSafe"] = k
+    elseif i == 98 then
+    	hashes1["BuySafe"] = k
+    elseif i == 64 then
+    	hashes1["SendSafe"] = k
     end
 end
 
