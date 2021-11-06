@@ -1,11 +1,9 @@
--- Added Open Safe, Buy Safe, SendSafe, Give Donut and Eat Donut
-
 local hashes
 local hashes1 = {}
 for i,v in pairs(getgc(true)) do
     if type(v) == "table" then
         for k2,v2 in pairs(v) do
-            if type(v2) == "string" and v2:sub(1,1) == "!" and #v2 == 37 then
+            if type(v2) == "string" and v2:sub(1,1) == "!" then
                 hashes = v
             end
         end
@@ -16,34 +14,33 @@ local i = 0
 for k,v in pairs(hashes) do
     i += 1
     if i == 90 then
-        hashes1["Enter Vehicle"] = k -- yes
+        hashes1["Enter Vehicle"] = k
     elseif i == 39 then
-        hashes1["Spawn Vehicle"] = k -- yes
+        hashes1["Spawn Vehicle"] = k
     elseif i == 11 then
-        hashes1["Shoot Vehicle"] = k -- yes
+        hashes1["Shoot Vehicle"] = k
     elseif i == 20 then
-        hashes1["Change Team"] = k -- yes
+        hashes1["Change Team"] = k
     elseif i == 38 then
-        hashes1["Arrest Player"] = k -- yes
+        hashes1["Arrest Player"] = k
     elseif i == 106 then
-        hashes1["Eject Vehicle"] = k -- yes
+        hashes1["Eject Vehicle"] = k
     elseif i == 54 then
-        hashes1["Tase"] = k -- yes
+        hashes1["Tase"] = k
     elseif i == 55 then
         hashes1["Attach Crate"] = k
     elseif i == 40 then
-    	hashes1["Give Donut"] = k -- yes 
+    	hashes1["Give Donut"] = k
     elseif i == 103 then
-    	hashes1["Eat Donut"] = k -- yes
+    	hashes1["Eat Donut"] = k
     elseif i == 100 then
-    	hashes1["Open Safe"] = k -- yes 
+    	hashes1["Open Safe"] = k
     elseif i == 98 then
-    	hashes1["Buy Safe"] = k -- yes
+    	hashes1["Buy Safe"] = k
     elseif i == 64 then
-    	hashes1["Send Safe"] = k -- yes
-    else if i == 128 then
-    	hashes1["DropRope"] = k -- yes
+    	hashes1["Send Safe"] = k
+    elseif i == 128 then
+    	hashes1["DropRope"] = k
     end
 end
-
 return hashes1
