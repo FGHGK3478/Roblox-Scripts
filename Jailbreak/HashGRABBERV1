@@ -13,19 +13,19 @@ end
 local i = 0
 for k,v in pairs(hashes) do
     i += 1
-    if i == 90 then
+    if i == 47 then
         hashes1["Enter Vehicle"] = k
-    elseif i == 39 then
+    elseif i == 69 then
         hashes1["Spawn Vehicle"] = k
-    elseif i == 11 then
+    elseif i == 109 then
         hashes1["Shoot Vehicle"] = k
-    elseif i == 20 then
+    elseif i == 55 then
         hashes1["Change Team"] = k
-    elseif i == 38 then
+    elseif i == 194 then
         hashes1["Arrest Player"] = k
-    elseif i == 106 then
+    elseif i == 117 then
         hashes1["Eject Vehicle"] = k
-    elseif i == 54 then
+    elseif i == 77 then
         hashes1["Tase"] = k
     elseif i == 55 then
         hashes1["Attach Crate"] = k
@@ -39,8 +39,12 @@ for k,v in pairs(hashes) do
     	hashes1["Buy Safe"] = k
     elseif i == 64 then
     	hashes1["Send Safe"] = k
-    elseif i == 128 then
+    elseif i == 21 then
     	hashes1["DropRope"] = k
+    elseif i == 17 then
+        hashes1["Drop Selected Item"] = k
+    elseif i == 58 then
+        hashes1["Lock Vehicle"] = k
     end
 end
 return hashes1
