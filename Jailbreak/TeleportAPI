@@ -257,6 +257,9 @@ function Functions:TeleportWithVehicle(cframe, speed, vehicleName) -- Leave carN
         return
     end
     while wait() do
+        if human and rootpart == nil then
+            return
+        end
         if char:FindFirstChild("InVehicle") then
             local currentVehicle
             for i,v in pairs(workspace.Vehicles:GetChildren()) do
@@ -407,3 +410,5 @@ function Functions:TeleportWithVehicle(cframe, speed, vehicleName) -- Leave carN
         end
     end
 end
+
+return Functions
