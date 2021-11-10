@@ -87,12 +87,7 @@ local function findexitFromVector3(vec)
                 table.insert(exitWaypoints, waypoint)
                 local isPartBlockedAbove = workspace:FindPartOnRayWithIgnoreList(Ray.new(waypoint.Position, Vector3.new(0, 1000, 0)), partsNoclipable)
                 if not isPartBlockedAbove then
-                    if waypoints[i + 1] and not workspace:FindPartOnRayWithIgnoreList(Ray.new(waypoints[i + 1].Position, Vector3.new(0, 1000, 0)), partsNoclipable) then
-                        table.insert(exitWaypoints, waypoints[i + 1])
-                        return waypoints[i + 1].Position, exitWaypoints
-                    else
-                        return waypoint.Position, exitWaypoints
-                    end
+                    return waypoint.Position, exitWaypoints
                 end
             end
         end
@@ -123,12 +118,7 @@ local function findexitFromVector3(vec)
                             table.insert(exitWaypoints, waypoint)
                             local isPartBlockedAbove = workspace:FindPartOnRayWithIgnoreList(Ray.new(waypoint.Position, Vector3.new(0, 1000, 0)), partsNoclipable)
                             if not isPartBlockedAbove then
-                                if waypoints[i + 1] and not workspace:FindPartOnRayWithIgnoreList(Ray.new(waypoints[i + 1].Position, Vector3.new(0, 1000, 0)), partsNoclipable) then
-                                    table.insert(exitWaypoints, waypoints[i + 1])
-                                    return waypoints[i + 1].Position, exitWaypoints
-                                else
-                                    return waypoint.Position, exitWaypoints
-                                end
+                                return waypoint.Position, exitWaypoints
                             end
                         end
                     end
