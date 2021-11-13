@@ -108,7 +108,7 @@ local function findexitFromVector3(vec)
                 return (one - vec).Magnitude < (two - vec).Magnitude
             end)
             for i,exit in pairs(exits) do
-                local isOnMidAir = not workspace:FindPartOnRayWithIgnoreList(Ray.new(exit, Vector3.new(0, -5, 0)), partsNoclipable)
+                local isOnMidAir = not workspace:FindPartOnRayWithIgnoreList(Ray.new(exit, Vector3.new(0, -10, 0)), partsNoclipable)
                 local isPartBlockedAbove = workspace:FindPartOnRayWithIgnoreList(Ray.new(exit, Vector3.new(0, 1000, 0)), partsNoclipable)
                 local exitWaypoints = {}
                 if not (isOnMidAir and isPartBlockedAbove) then
@@ -132,7 +132,7 @@ function Functions:Teleport(cframe, speed, direction)
     local char = game.Players.LocalPlayer.Character
     local rootpart = char and char:FindFirstChild("HumanoidRootPart")
     local human = char and char:FindFirstChild("Humanoid")
-    if human and rootpart == nil then
+    if not (human and rootpart) then
         return
     end
     if cframe == nil then
@@ -149,7 +149,9 @@ function Functions:Teleport(cframe, speed, direction)
     if direction == "up" then
         local isPartBlockedAbove = workspace:FindPartOnRayWithIgnoreList(Ray.new(rootpart.Position, Vector3.new(0, 1000, 0)), partsNoclipable)
         if isPartBlockedAbove then
+            print('blocked')
             local exit, waypoints = findexitFromVector3(rootpart.Position)
+            print(exit, waypoints)
             if exit and waypoints then
                 for i,waypoint in pairs(waypoints) do
                     local waypointDestination = waypoint.Position + Vector3.new(0, 4, 0)
