@@ -304,18 +304,19 @@ function Functions:TeleportWithVehicle(cframe, speed, vehicleName) -- Leave carN
                     if rootpart.Position.Y < 499 then
                         for i,d in pairs(currentVehicle:GetDescendants()) do
                             if d:IsA("BasePart") then
-                                d.CFrame = CFrame.new(d.CFrame.X, 500, d.CFrame.Z)
+                                d.CFrame = CFrame.new(d.CFrame.X, 1000, d.CFrame.Z)
                             end
                         end
                     end
-                    move.Velocity = (Vector3.new(cframe.X, 500, cframe.Z) - rootpart.Position).Unit * speed
-                until not char:FindFirstChild("InVehicle") or (Vector3.new(cframe.X, 500, cframe.Z) - rootpart.Position).Magnitude < 5
+                    move.Velocity = (Vector3.new(cframe.X, 1000, cframe.Z) - rootpart.Position).Unit * speed
+                until not char:FindFirstChild("InVehicle") or (Vector3.new(cframe.X, 1000, cframe.Z) - rootpart.Position).Magnitude < 5
                 if not char:FindFirstChild("InVehicle") then
                     move.Velocity = Vector3.new()
                     wait()
                     move:Destroy()
                 else
                     move.Velocity = Vector3.new()
+                    wait(0.5)
                     for i,d in pairs(currentVehicle:GetDescendants()) do
                         if d:IsA("BasePart") then
                             d.CFrame = cframe
