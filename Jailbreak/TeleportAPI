@@ -143,6 +143,7 @@ function Functions:Teleport(cframe, speed, direction)
     end
     local move = create("BodyVelocity", {
         ["Parent"] = rootpart,
+        ["Velocity"] = Vector3.new(),
         ["MaxForce"] = Vector3.new(1, 1, 1) * math.huge,
         ["P"] = math.huge
     })
@@ -160,13 +161,12 @@ function Functions:Teleport(cframe, speed, direction)
                             waypointDestination = Vector3.new(waypoint.Position.X, rootpart.Position.Y, waypoint.Position.Z)
                         end
                     end
-                    local sharpTurn = waypoints[i - 3] and waypoints[i + 3] and workspace:FindPartOnRayWithIgnoreList(Ray.new(waypoints[i - 3].Position + Vector3.new(0, 4, 0), (waypoints[i + 3].Position - waypoints[i - 3].Position) + Vector3.new(0, 4, 0)), partsNoclipable)
+                    local sharpTurn = waypoints[i - 2] and waypoints[i + 2] and workspace:FindPartOnRayWithIgnoreList(Ray.new(waypoints[i - 2].Position + Vector3.new(0, 4, 0), (waypoints[i + 2].Position - waypoints[i - 2].Position) + Vector3.new(0, 4, 0)), partsNoclipable)
+                    local tween = game:GetService("TweenService"):Create(rootpart, TweenInfo.new((waypointDestination - rootpart.Position).Magnitude / 100, Enum.EasingStyle.Linear), {CFrame = CFrame.new(waypointDestination)})
+                    tween:Play()
+                    tween.Completed:Wait()
                     if sharpTurn then
-                        move.Velocity = (waypointDestination - rootpart.Position).Unit * 21
-                        wait((waypointDestination - rootpart.Position).Magnitude / 21)
-                    else
-                        move.Velocity = (waypointDestination - rootpart.Position).Unit * speed
-                        wait((waypointDestination - rootpart.Position).Magnitude / speed)
+                        wait(0.3)
                     end
                 end
                 move.Velocity = Vector3.new()
@@ -194,13 +194,12 @@ function Functions:Teleport(cframe, speed, direction)
                             waypointDestination = Vector3.new(waypoint.Position.X, rootpart.Position.Y, waypoint.Position.Z)
                         end
                     end
-                    local sharpTurn = waypoints[i - 3] and waypoints[i + 3] and workspace:FindPartOnRayWithIgnoreList(Ray.new(waypoints[i - 3].Position + Vector3.new(0, 4, 0), (waypoints[i + 3].Position - waypoints[i - 3].Position) + Vector3.new(0, 4, 0)), partsNoclipable)
+                    local sharpTurn = waypoints[i - 2] and waypoints[i + 2] and workspace:FindPartOnRayWithIgnoreList(Ray.new(waypoints[i - 2].Position + Vector3.new(0, 4, 0), (waypoints[i + 2].Position - waypoints[i - 2].Position) + Vector3.new(0, 4, 0)), partsNoclipable)
+                    local tween = game:GetService("TweenService"):Create(rootpart, TweenInfo.new((waypointDestination - rootpart.Position).Magnitude / 100, Enum.EasingStyle.Linear), {CFrame = CFrame.new(waypointDestination)})
+                    tween:Play()
+                    tween.Completed:Wait()
                     if sharpTurn then
-                        move.Velocity = (waypointDestination - rootpart.Position).Unit * 21
-                        wait((waypointDestination - rootpart.Position).Magnitude / 21)
-                    else
-                        move.Velocity = (waypointDestination - rootpart.Position).Unit * speed
-                        wait((waypointDestination - rootpart.Position).Magnitude / speed)
+                        wait(0.3)
                     end
                 end
                 move.Velocity = Vector3.new()
@@ -223,13 +222,12 @@ function Functions:Teleport(cframe, speed, direction)
                             waypointDestination = Vector3.new(waypoint.Position.X, rootpart.Position.Y, waypoint.Position.Z)
                         end
                     end
-                    local sharpTurn = waypoints[i - 3] and waypoints[i + 3] and workspace:FindPartOnRayWithIgnoreList(Ray.new(waypoints[i - 3].Position + Vector3.new(0, 4, 0), (waypoints[i + 3].Position - waypoints[i - 3].Position) + Vector3.new(0, 4, 0)), partsNoclipable)
+                    local sharpTurn = waypoints[i - 2] and waypoints[i + 2] and workspace:FindPartOnRayWithIgnoreList(Ray.new(waypoints[i - 2].Position + Vector3.new(0, 4, 0), (waypoints[i + 2].Position - waypoints[i - 2].Position) + Vector3.new(0, 4, 0)), partsNoclipable)
+                    local tween = game:GetService("TweenService"):Create(rootpart, TweenInfo.new((waypointDestination - rootpart.Position).Magnitude / 100, Enum.EasingStyle.Linear), {CFrame = CFrame.new(waypointDestination)})
+                    tween:Play()
+                    tween.Completed:Wait()
                     if sharpTurn then
-                        move.Velocity = (waypointDestination - rootpart.Position).Unit * 21
-                        wait((waypointDestination - rootpart.Position).Magnitude / 21)
-                    else
-                        move.Velocity = (waypointDestination - rootpart.Position).Unit * speed
-                        wait((waypointDestination - rootpart.Position).Magnitude / speed)
+                        wait(0.3)
                     end
                 end
                 move.Velocity = Vector3.new()
