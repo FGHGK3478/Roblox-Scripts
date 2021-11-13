@@ -5,12 +5,10 @@ local Functions = {}
 local partsNoclipable = {}
 
 for i,d in pairs(workspace:GetDescendants()) do
-    if d:IsA("Model") or d:IsA("Folder") then
-        if game.Players:FindFirstChild(d.Name) or d.Name == "Rain" or d.Name == "Vehicles" or d.Name == "VehicleSpawns" or d.Name == "Trains" or d.Name == "CargoPlane" or d.Name == "CargoShip" then
-            table.insert(partsNoclipable, d)
-        elseif d.Name == "SwingDoor" or d.Name == "SlideDoor" then
-        	d:Destroy()
-        end
+    if d.Name == "Rain" or d.Name == "Vehicles" or d.Name == "VehicleSpawns" or d.Name == "Trains" or d.Name == "Plane" or d.Name == "CargoShip" then
+        table.insert(partsNoclipable, d)
+    elseif d.Name == "SwingDoor" or d.Name == "SlideDoor" then
+        d:Destroy()
     elseif d:IsA("BasePart") then
         if not d.CanCollide then
             table.insert(partsNoclipable, d)
@@ -18,12 +16,8 @@ for i,d in pairs(workspace:GetDescendants()) do
     end
 end
 workspace.DescendantAdded:Connect(function(d)
-    if d:IsA("Model") or d:IsA("Folder") then
-        if game.Players:FindFirstChild(d.Name) or d.Name == "Rain" or d.Name == "Vehicles" or d.Name == "VehicleSpawns" or d.Name == "Trains" or d.Name == "CargoPlane" or d.Name == "CargoShip" then
-            table.insert(partsNoclipable, d)
-        elseif d.Name == "SwingDoor" or d.Name == "SlideDoor" then
-        	d:Destroy()
-        end
+    if d.Name == "Rain" d.Name == "Plane" or d.Name == "CargoShip" then
+        table.insert(partsNoclipable, d)
     elseif d:IsA("BasePart") then
         if not d.CanCollide then
             table.insert(partsNoclipable, d)
@@ -39,7 +33,7 @@ end
 local function jump()
     game:GetService("VirtualInputManager"):SendKeyEvent(true, "Space", false, game)
     wait()
-    game:GetService("VirtualInputManager"):SendKeyEvent(not true, "Space", false, game)
+    game:GetService("VirtualInputManager"):SendKeyEvent(false, "Space", false, game)
 end
 
 local function create(instanceName, property)
@@ -54,30 +48,22 @@ local function createPath(startPos, endPos)
     if endPos.Y > startPos.Y then
         local path = game:GetService("PathfindingService"):CreatePath()
         path:ComputeAsync(endPos, startPos)
-        if path.Status ~= Enum.PathStatus.NoPath then
-            --/Reverse a waypoints
-            local waypoints = path:GetWaypoints()
-            local reversedwaypoints = {}
-            for i = #waypoints, 1, -1 do
-                local waypoint = waypoints[i]
-                table.insert(reversedwaypoints, waypoint)
-            end
-            return reversedwaypoints
+        local waypoints = path:GetWaypoints()
+        local reversedwaypoints = {}
+        for i = #waypoints, 1, -1 do
+            local waypoint = waypoints[i]
+            table.insert(reversedwaypoints, waypoint)
         end
+        return reversedwaypoints
     else
         local path = game:GetService("PathfindingService"):CreatePath()
         path:ComputeAsync(startPos, endPos)
-        if path.Status ~= Enum.PathStatus.NoPath then
-            --/Reverse a waypoints
-            local waypoints = path:GetWaypoints()
-            return waypoints
-        end
+        local waypoints = path:GetWaypoints()
+        return waypoints
     end
-    return nil
 end
 
 local function findexitFromVector3(vec)
-    -- Nothing to see here ;)
     local _, exitPos = workspace:FindPartOnRayWithIgnoreList(Ray.new(vec + Vector3.new(0, 1000, 0), Vector3.new(0, -1000, 0)), partsNoclipable)
     if exitPos then
         local waypoints = createPath(vec, exitPos)
