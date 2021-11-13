@@ -177,7 +177,7 @@ function Functions:Teleport(cframe, speed, direction)
         wait()
         local destinationTime = (CFrame.new(cframe.X, 1000, cframe.Z).p - rootpart.Position).Magnitude / speed
         local currenttime = tick()
-        while tick() - currenttime < destinationTime do
+        while tick() - currenttime < destinationTime + 10 and (CFrame.new(cframe.X, 1000, cframe.Z).p - rootpart.Position).Magnitude > (speed / 50) do
             move.Velocity = (CFrame.new(cframe.X, 1000, cframe.Z).p - rootpart.Position).Unit * speed
             wait()
         end
@@ -236,7 +236,7 @@ function Functions:Teleport(cframe, speed, direction)
         end
         local destinationTime = (cframe.p - rootpart.Position).Magnitude / speed
         local currenttime = tick()
-        while tick() - currenttime < destinationTime do
+        while tick() - currenttime < destinationTime + 10 and (cframe.p - rootpart.Position).Magnitude > (speed / 50) do
             move.Velocity = (cframe.p - rootpart.Position).Unit * speed
             wait()
         end
