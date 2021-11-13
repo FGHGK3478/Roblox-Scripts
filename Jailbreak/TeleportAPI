@@ -301,7 +301,7 @@ function Functions:TeleportWithVehicle(cframe, speed, vehicleName) -- Leave carN
                             end
                         end
                     end
-                    if rootpart.Position.Y < 999 then
+                    if rootpart.Position.Y < 499 then
                         for i,d in pairs(currentVehicle:GetDescendants()) do
                             if d:IsA("BasePart") then
                                 d.CFrame = CFrame.new(d.CFrame.X, 500, d.CFrame.Z)
