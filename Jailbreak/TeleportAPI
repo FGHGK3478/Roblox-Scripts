@@ -5,7 +5,7 @@ local Functions = {}
 local partsNoclipable = {}
 
 for i,d in pairs(workspace:GetDescendants()) do
-    if d.Name == "Rain" or d.Name == "Vehicles" or d.Name == "VehicleSpawns" or d.Name == "Trains" or d.Name == "Plane" or d.Name == "CargoShip" then
+    if d.Name == game.Players.LocalPlayer.Name or d.Name == "Rain" or d.Name == "Vehicles" or d.Name == "VehicleSpawns" or d.Name == "Trains" or d.Name == "Plane" or d.Name == "CargoShip" then
         table.insert(partsNoclipable, d)
     elseif d.Name == "SwingDoor" or d.Name == "SlideDoor" then
         d:Destroy()
@@ -16,8 +16,10 @@ for i,d in pairs(workspace:GetDescendants()) do
     end
 end
 workspace.DescendantAdded:Connect(function(d)
-    if d.Name == "Rain" d.Name == "Plane" or d.Name == "CargoShip" then
+    if d.Name == game.Players.LocalPlayer.Name or d.Name == "Rain" or d.Name == "Vehicles" or d.Name == "VehicleSpawns" or d.Name == "Trains" or d.Name == "Plane" or d.Name == "CargoShip" then
         table.insert(partsNoclipable, d)
+    elseif d.Name == "SwingDoor" or d.Name == "SlideDoor" then
+        d:Destroy()
     elseif d:IsA("BasePart") then
         if not d.CanCollide then
             table.insert(partsNoclipable, d)
