@@ -1,29 +1,31 @@
 if not game:IsLoaded() then game.Loaded:Wait() end
 if not game.Players.LocalPlayer.PlayerGui:FindFirstChild("HotbarGui") then repeat wait() until game.Players.LocalPlayer.PlayerGui:FindFirstChild("HotbarGui") end
+if getgenv().Functions ~= nil and rawget(getgenv().Functions, "Teleport") and rawget(getgenv().Functions, "TeleportWithVehicle") then return getgenv().Functions end
 
-local Functions = {}
-local partsNoclipable = {}
+getgenv().Functions = setmetatable({}, {
+	__index = function(t, k)
+		warn(("Failed to index key '%s' from table '%s' (a nil value)"):format(tostring(k), tostring(t)))
+        return(function(...)print(tostring(...))end)
+	end
+})
+local partsNoclipable = {
+    workspace.Vehicles,
+    workspace.VehicleSpawns,
+    workspace.Trains,
+    workspace.TouchTrigger,
+    workspace.Items
+}
 
-for i,d in pairs(workspace:GetDescendants()) do
-    if d.Name == game.Players.LocalPlayer.Name or d.Name == "Rain" or d.Name == "Vehicles" or d.Name == "VehicleSpawns" or d.Name == "Trains" or d.Name == "Plane" or d.Name == "CargoShip" then
+for i,d in pairs(workspace:GetChildren()) do
+    if game.Players:FindFirstChild(d.Name) or d.Name == "Rain" or d.Name == "Plane" or d.Name == "CargoShip" then
         table.insert(partsNoclipable, d)
     elseif d.Name == "SwingDoor" or d.Name == "SlideDoor" then
         d:Destroy()
-    elseif d:IsA("BasePart") then
-        if not d.CanCollide then
-            table.insert(partsNoclipable, d)
-        end
     end
 end
-workspace.DescendantAdded:Connect(function(d)
-    if d.Name == game.Players.LocalPlayer.Name or d.Name == "Rain" or d.Name == "Vehicles" or d.Name == "VehicleSpawns" or d.Name == "Trains" or d.Name == "Plane" or d.Name == "CargoShip" then
+workspace.ChildAdded:Connect(function(d)
+    if game.Players:FindFirstChild(d.Name) or d.Name == "Rain" or d.Name == "Plane" or d.Name == "CargoShip" then
         table.insert(partsNoclipable, d)
-    elseif d.Name == "SwingDoor" or d.Name == "SlideDoor" then
-        d:Destroy()
-    elseif d:IsA("BasePart") then
-        if not d.CanCollide then
-            table.insert(partsNoclipable, d)
-        end
     end
 end)
 
@@ -32,13 +34,13 @@ require(game.ReplicatedStorage.Game.Paraglide).IsFlying = function()
 end
 
 --/Functions
-local function jump()
+function jump()
     game:GetService("VirtualInputManager"):SendKeyEvent(true, "Space", false, game)
     wait()
     game:GetService("VirtualInputManager"):SendKeyEvent(false, "Space", false, game)
 end
 
-local function create(instanceName, property)
+function create(instanceName, property)
     local instance = Instance.new(instanceName)
     for k,v in pairs(property) do
         instance[k] = v
@@ -46,7 +48,7 @@ local function create(instanceName, property)
     return instance
 end
 
-local function createPath(startPos, endPos)
+function createPath(startPos, endPos)
     if endPos.Y > startPos.Y then
         local path = game:GetService("PathfindingService"):CreatePath()
         path:ComputeAsync(endPos, startPos)
@@ -65,7 +67,7 @@ local function createPath(startPos, endPos)
     end
 end
 
-local function findexitFromVector3(vec)
+function findexitFromVector3(vec)
     local _, exitPos = workspace:FindPartOnRayWithIgnoreList(Ray.new(vec + Vector3.new(0, 1000, 0), Vector3.new(0, -1000, 0)), partsNoclipable)
     if exitPos then
         local waypoints = createPath(vec, exitPos)
@@ -400,4 +402,5 @@ function Functions:TeleportWithVehicle(cframe, speed, vehicleName) -- Leave carN
     end
 end
 
-return Functions
+setreadonly(getgenv().Functions, true)
+return (getgenv().Functions)
