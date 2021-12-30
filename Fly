@@ -2,7 +2,7 @@
 
 for K,V in pairs(getgenv().Config) do
     if K ~= "R6" and K ~= "KEY_CONTROL" then
-        getgenv().Config[K] = type(V) == "number" and math.abs(V) or 5
+        getgenv().Config[K] = type(V) == "number" and math.abs(V) or ((K == "STOP_FORCE" or K == "MOVE_FORCE") and 2) or (K == "TURN_FORCE" and 5e3) or 100
     end
 end
 
