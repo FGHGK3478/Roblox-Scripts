@@ -6,10 +6,6 @@ for K,V in pairs(getgenv().Config) do
     end
 end
 
-for K,V in pairs(getgenv().Config.KEY_CONTROL) do
-    getgenv().Config.KEY_CONTROL[K] = V:upper();
-end;
-
 if getgenv().FLY_LOADED then return end;
 
 if not game:IsLoaded() then
