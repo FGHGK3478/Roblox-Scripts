@@ -123,6 +123,8 @@ UIS.InputBegan:Connect(function(Input)
             repeat wait();
                 if getgenv().Config.R6 then
                     HUMANOID.PlatformStand = true;
+                else
+                    HUMANOID.PlatformStand = false;
                 end;
                 TURN.P = getgenv().Config.TURN_FORCE
                 TURN.CFrame = CAMERA.CFrame
