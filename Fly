@@ -1,0 +1,147 @@
+--/ Check Errors
+
+for K,V in pairs(getgenv().Config) do
+    if K ~= "R6" and K ~= "KEY_CONTROL" then
+        getgenv().Config[K] = type(V) == "number" and math.abs(V) or 5
+    end
+end
+
+for K,V in pairs(getgenv().Config.KEY_CONTROL) do
+    getgenv().Config.KEY_CONTROL[K] = V:upper();
+end;
+
+if getgenv().FLY_LOADED then return end;
+
+if not game:IsLoaded() then
+    game.Loaded:Wait();
+end;
+--/ Services
+
+local PLAYERS = game:GetService("Players");
+local UIS = game:GetService("UserInputService");
+local RSV = game:GetService("RunService")
+
+--/ Variables
+local LOCAL_PLAYER = PLAYERS.LocalPlayer
+local CAMERA = workspace.CurrentCamera
+local FLY_TOGGLED = false;
+local X_SPEED = 0;
+local Y_SPEED = 0;
+local Z_SPEED = 0;
+
+RSV.RenderStepped:Connect(function()
+    if FLY_TOGGLED then
+        if UIS:IsKeyDown(Enum.KeyCode.W) and not UIS:IsKeyDown(Enum.KeyCode.S) then
+            X_SPEED += getgenv().Config.MOVE_FORCE;
+        end;
+        if UIS:IsKeyDown(Enum.KeyCode.S) and not UIS:IsKeyDown(Enum.KeyCode.W) then
+            X_SPEED -= getgenv().Config.MOVE_FORCE;
+        end;
+        if UIS:IsKeyDown(Enum.KeyCode[getgenv().Config.KEY_CONTROL.FLY_UP]) and not UIS:IsKeyDown(Enum.KeyCode[getgenv().Config.KEY_CONTROL.FLY_DOWN]) then
+            Y_SPEED += getgenv().Config.MOVE_FORCE;
+        end;
+        if UIS:IsKeyDown(Enum.KeyCode[getgenv().Config.KEY_CONTROL.FLY_DOWN]) and not UIS:IsKeyDown(Enum.KeyCode[getgenv().Config.KEY_CONTROL.FLY_UP]) then
+            Y_SPEED -= getgenv().Config.MOVE_FORCE;
+        end;
+        if UIS:IsKeyDown(Enum.KeyCode.A) and not UIS:IsKeyDown(Enum.KeyCode.D) then
+            Z_SPEED -= getgenv().Config.MOVE_FORCE;
+        end;
+        if UIS:IsKeyDown(Enum.KeyCode.D) and not UIS:IsKeyDown(Enum.KeyCode.A) then
+            Z_SPEED += getgenv().Config.MOVE_FORCE;
+        end;
+        if math.abs(X_SPEED) > getgenv().Config.MAX_SPEED then X_SPEED = tonumber(tostring(tostring(X_SPEED):gsub("%d+", getgenv().Config.MAX_SPEED))) end;
+        if math.abs(Y_SPEED) > getgenv().Config.MAX_SPEED then Y_SPEED = tonumber(tostring(tostring(Y_SPEED):gsub("%d+", getgenv().Config.MAX_SPEED))) end;
+        if math.abs(Z_SPEED) > getgenv().Config.MAX_SPEED then Z_SPEED = tonumber(tostring(tostring(Z_SPEED):gsub("%d+", getgenv().Config.MAX_SPEED))) end;
+        if (UIS:IsKeyDown(Enum.KeyCode.W) == false and UIS:IsKeyDown(Enum.KeyCode.S) == false) or (UIS:IsKeyDown(Enum.KeyCode.W) and UIS:IsKeyDown(Enum.KeyCode.S)) then
+            if math.abs(X_SPEED) <= getgenv().Config.STOP_FORCE then
+                X_SPEED = 0;
+            elseif X_SPEED > 0 then
+                X_SPEED -= getgenv().Config.STOP_FORCE;
+            elseif X_SPEED < 0 then
+                X_SPEED += getgenv().Config.STOP_FORCE;
+            end;
+        end;
+        if (UIS:IsKeyDown(Enum.KeyCode[getgenv().Config.KEY_CONTROL.FLY_UP]) == false and UIS:IsKeyDown(Enum.KeyCode[getgenv().Config.KEY_CONTROL.FLY_DOWN]) == false) or (UIS:IsKeyDown(Enum.KeyCode[getgenv().Config.KEY_CONTROL.FLY_UP]) and UIS:IsKeyDown(Enum.KeyCode[getgenv().Config.KEY_CONTROL.FLY_DOWN])) then
+            if math.abs(Y_SPEED) <= getgenv().Config.STOP_FORCE then
+                Y_SPEED = 0;
+            elseif Y_SPEED > 0 then
+                Y_SPEED -= getgenv().Config.STOP_FORCE;
+            elseif Y_SPEED < 0 then
+                Y_SPEED += getgenv().Config.STOP_FORCE;
+            end;
+        end;
+        if (UIS:IsKeyDown(Enum.KeyCode.A) == false and UIS:IsKeyDown(Enum.KeyCode.D) == false) or (UIS:IsKeyDown(Enum.KeyCode.A) and UIS:IsKeyDown(Enum.KeyCode.D)) then
+            if math.abs(Z_SPEED) <= getgenv().Config.STOP_FORCE then
+                Z_SPEED = 0;
+            elseif Z_SPEED > 0 then
+                Z_SPEED -= getgenv().Config.STOP_FORCE;
+            elseif Z_SPEED < 0 then
+                Z_SPEED += getgenv().Config.STOP_FORCE;
+            end;
+        end;
+    else
+        if X_SPEED < 0 then
+            X_SPEED += getgenv().Config.STOP_FORCE;
+        elseif X_SPEED > 0 then
+            X_SPEED -= getgenv().Config.STOP_FORCE;
+        end;
+        if Y_SPEED < 0 then
+            Y_SPEED += getgenv().Config.STOP_FORCE;
+        elseif Y_SPEED > 0 then
+            Y_SPEED -= getgenv().Config.STOP_FORCE;
+        end;
+        if Z_SPEED < 0 then
+            Z_SPEED += getgenv().Config.STOP_FORCE;
+        elseif Z_SPEED > 0 then
+            Z_SPEED -= getgenv().Config.STOP_FORCE;
+        end;
+        if math.abs(X_SPEED) < 0 then X_SPEED = 0 end;
+        if math.abs(Y_SPEED) < 0 then Y_SPEED = 0 end;
+        if math.abs(Z_SPEED) < 0 then Z_SPEED = 0 end;
+    end;
+end);
+
+UIS.InputBegan:Connect(function(Input)
+    if Input.KeyCode == Enum.KeyCode[getgenv().Config.KEY_CONTROL.TOGGLE_FLY] then
+        FLY_TOGGLED = not FLY_TOGGLED
+        if FLY_TOGGLED then
+            local CHARACTER = LOCAL_PLAYER.Character;
+            if not CHARACTER then
+                return;
+            end;
+            local HUMANOID = CHARACTER:FindFirstChild("Humanoid");
+            local HUMANOID_ROOTPART = CHARACTER:FindFirstChild("HumanoidRootPart");
+            if not (HUMANOID and HUMANOID_ROOTPART) then
+                return;
+            end;
+            local MOVE = Instance.new("BodyVelocity", HUMANOID_ROOTPART);
+            local TURN = Instance.new("BodyGyro", HUMANOID_ROOTPART);
+            MOVE.Velocity = Vector3.new();
+            MOVE.MaxForce = Vector3.new(9e9, 9e9, 9e9);
+            MOVE.P = 3000;
+            TURN.MaxTorque = Vector3.new(9e9, 9e9, 9e9);
+            repeat wait();
+                if getgenv().Config.R6 then
+                    HUMANOID.PlatformStand = true;
+                end;
+                TURN.P = getgenv().Config.TURN_FORCE
+                TURN.CFrame = CAMERA.CFrame
+                MOVE.Velocity = (CAMERA.CFrame.lookVector * X_SPEED) + (CAMERA.CFrame.rightVector * Z_SPEED) + (CAMERA.CFrame * CFrame.new(0, Y_SPEED, 0) - CAMERA.CFrame.p).p
+                if MOVE.Velocity.Magnitude > getgenv().Config.MAX_SPEED then
+                    MOVE.Velocity = ((CAMERA.CFrame.lookVector * X_SPEED) + (CAMERA.CFrame.rightVector * Z_SPEED) + (CAMERA.CFrame * CFrame.new(0, Y_SPEED, 0) - CAMERA.CFrame.p).p).Unit * getgenv().Config.MAX_SPEED;
+                end;
+            until not (HUMANOID and HUMANOID_ROOTPART) or HUMANOID.Health == 0 or not FLY_TOGGLED;
+            if not (HUMANOID and HUMANOID_ROOTPART) or HUMANOID.Health == 0 then
+                FLY_TOGGLED = false;
+            else
+                HUMANOID.PlatformStand = false;
+                MOVE.Velocity = Vector3.new();
+                wait();
+                MOVE:Destroy();
+                TURN:Destroy();
+            end;
+        end;
+    end;
+end);
+
+getgenv().FLY_LOADED = true;
