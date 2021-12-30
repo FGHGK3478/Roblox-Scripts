@@ -80,24 +80,9 @@ RSV.RenderStepped:Connect(function()
             end;
         end;
     else
-        if X_SPEED < 0 then
-            X_SPEED += getgenv().Config.STOP_FORCE;
-        elseif X_SPEED > 0 then
-            X_SPEED -= getgenv().Config.STOP_FORCE;
-        end;
-        if Y_SPEED < 0 then
-            Y_SPEED += getgenv().Config.STOP_FORCE;
-        elseif Y_SPEED > 0 then
-            Y_SPEED -= getgenv().Config.STOP_FORCE;
-        end;
-        if Z_SPEED < 0 then
-            Z_SPEED += getgenv().Config.STOP_FORCE;
-        elseif Z_SPEED > 0 then
-            Z_SPEED -= getgenv().Config.STOP_FORCE;
-        end;
-        if math.abs(X_SPEED) < 0 then X_SPEED = 0 end;
-        if math.abs(Y_SPEED) < 0 then Y_SPEED = 0 end;
-        if math.abs(Z_SPEED) < 0 then Z_SPEED = 0 end;
+        X_SPEED = 0;
+        Y_SPEED = 0;
+        Z_SPEED = 0;
     end;
 end);
 
