@@ -69,7 +69,7 @@ function A_Star(StartPos, EndPos, IgnoreWalls, Radius)
             end
         end
         local current = openSet[winner]
-        if current.H < Radius and not workspace:FindPartOnRauWithIgnoreList(Ray.new(current.position, End.position - current.position), IgnoreWalls) then
+        if current.H < Radius and not workspace:FindPartOnRayWithIgnoreList(Ray.new(current.position, End.position - current.position), IgnoreWalls) then
             print("Found in "..tostring(tick() - start))
             local waypoints = {}
             table.insert(waypoints, current.position)
