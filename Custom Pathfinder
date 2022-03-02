@@ -62,6 +62,7 @@ function A_Star(StartPos, EndPos, IgnoreWalls, Radius)
     table.insert(openSet, Start)
     local start = tick()
     while #openSet > 0 do
+        wait()
         local winner = 1
         for i = 1,#openSet do
             if openSet[i].F < openSet[winner].F then
