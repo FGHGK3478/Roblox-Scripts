@@ -61,8 +61,13 @@ function A_Star(StartPos, EndPos, IgnoreWalls, Radius)
     End = Node.new(EndPos)
     table.insert(openSet, Start)
     local start = tick()
+    local attempts = 0
     while #openSet > 0 do
-        wait()
+
+        attempts = attempts + 1
+        if attempt > 200 then
+            return {Success = false, Error = "Destination too long"}
+        end
         local winner = 1
         for i = 1,#openSet do
             if openSet[i].F < openSet[winner].F then
@@ -70,15 +75,19 @@ function A_Star(StartPos, EndPos, IgnoreWalls, Radius)
             end
         end
         local current = openSet[winner]
-        if current.H < Radius and not workspace:FindPartOnRayWithIgnoreList(Ray.new(current.position, End.position - current.position), IgnoreWalls) then
-            print("Found in "..tostring(tick() - start))
+        if current.H < Radius then
+            local reversed_waypoints = {}
             local waypoints = {}
-            table.insert(waypoints, current.position)
+
+            table.insert(reversed_waypoints, current.position)
             while current.parent do
-                table.insert(waypoints, current.parent.position)
+                table.insert(reversed_waypoints, current.parent.position)
                 current = current.parent
             end
-            return waypoints
+            for i = #reversed_waypoints, 1, -1 do
+                table.insert(waypoints, reversed_waypoints[i])
+            end
+            return {Success = true, Waypoints = waypoints}
         end
         table.remove(openSet, winner)
         table.insert(closedSet, current)
@@ -87,6 +96,7 @@ function A_Star(StartPos, EndPos, IgnoreWalls, Radius)
             local neighbor = v
             if not CheckInclusion(closedSet, neighbor) then
                 local temp_g = current.G + (Radius - 1)
+                
                 if temp_g < neighbor.G then
                     neighbor.G = temp_g
                     neighbor.F = neighbor.G + neighbor.H
@@ -95,7 +105,6 @@ function A_Star(StartPos, EndPos, IgnoreWalls, Radius)
             end
         end
     end
+    return {Success = false, Error = "No open area"}
 end
 
-print('Loaded')
-return A_Star
