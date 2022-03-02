@@ -108,3 +108,4 @@ function A_Star(StartPos, EndPos, IgnoreWalls, Radius)
     return {Success = false, Error = "No open area"}
 end
 
+return A_Star
