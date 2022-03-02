@@ -80,6 +80,7 @@ function A_Star(StartPos, EndPos, IgnoreWalls, Radius)
             local waypoints = {}
 
             table.insert(reversed_waypoints, End.position)
+            table.insert(reversed_waypoints, current.position)
             while current.parent do
                 table.insert(reversed_waypoints, current.parent.position)
                 current = current.parent
