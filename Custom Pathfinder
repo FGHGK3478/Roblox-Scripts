@@ -87,6 +87,7 @@ function A_Star(StartPos, EndPos, IgnoreWalls, Radius)
             for i = #reversed_waypoints, 1, -1 do
                 table.insert(waypoints, reversed_waypoints[i])
             end
+            table.insert(waypoints, 1)
             return {Success = true, Waypoints = waypoints}
         end
         table.remove(openSet, winner)
