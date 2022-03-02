@@ -65,7 +65,7 @@ function A_Star(StartPos, EndPos, IgnoreWalls, Radius)
     while #openSet > 0 do
 
         attempts = attempts + 1
-        if attempt > 200 then
+        if attempts > 200 then
             return {Success = false, Error = "Destination too long"}
         end
         local winner = 1
