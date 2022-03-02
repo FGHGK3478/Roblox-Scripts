@@ -7,7 +7,13 @@ function CheckInclusion(tbl, elem)
     return false
 end
 
-function A_Star(StartPos, EndPos, IgnoreWalls)
+function A_Star(StartPos, EndPos, IgnoreWalls, Radius)
+    if not IgnoreWalls then
+        IgnoreWalls = {}
+    end
+    if not Radius then
+        Radius = 10
+    end
     local openSet = {}
     local closedSet = {}
     local Node = {}
@@ -22,9 +28,9 @@ function A_Star(StartPos, EndPos, IgnoreWalls)
         return node
     end
     Node.addNeighbors = function(node)
-        for x = -10,10,10 do
-            for y = -10,10,10 do
-            for z = -10,10,10 do
+        for x = -Radius,Radius,Radius do
+            for y = -Radius,Radius,Radius do
+            for z = -Radius,Radius,Radius do
                 local neighborExist = false
                 for i,v in pairs(openSet) do
                     if v.position == node.position + Vector3.new(x, y, z) then
@@ -63,7 +69,7 @@ function A_Star(StartPos, EndPos, IgnoreWalls)
             end
         end
         local current = openSet[winner]
-        if current.H < 10 then
+        if current.H < Radius and not workspace:FindPartOnRauWithIgnoreList(Ray.new(current.position, End.position - current.position), IgnoreWalls) then
             print("Found in "..tostring(tick() - start))
             local waypoints = {}
             table.insert(waypoints, current.position)
@@ -79,7 +85,7 @@ function A_Star(StartPos, EndPos, IgnoreWalls)
         for i,v in pairs(current.neighbors) do
             local neighbor = v
             if not CheckInclusion(closedSet, neighbor) then
-                local temp_g = current.G + 10
+                local temp_g = current.G + (Radius - 1)
                 if temp_g < neighbor.G then
                     neighbor.G = temp_g
                     neighbor.F = neighbor.G + neighbor.H
