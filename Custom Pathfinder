@@ -1,0 +1,94 @@
+function CheckInclusion(tbl, elem)
+    for i,v in pairs(tbl) do
+        if v == elem then
+            return true
+        end
+    end
+    return false
+end
+
+function A_Star(StartPos, EndPos, IgnoreWalls)
+    local openSet = {}
+    local closedSet = {}
+    local Node = {}
+    Node.new = function(Pos)
+        local node = {}
+        node.G = math.floor((StartPos - Pos).Magnitude)
+        node.H = math.floor((EndPos - Pos).Magnitude)
+        node.F = node.G + node.H
+        node.position = Pos
+        node.parent = nil
+        node.neighbors = {}
+        return node
+    end
+    Node.addNeighbors = function(node)
+        for x = -10,10,10 do
+            for y = -10,10,10 do
+            for z = -10,10,10 do
+                local neighborExist = false
+                for i,v in pairs(openSet) do
+                    if v.position == node.position + Vector3.new(x, y, z) then
+                        table.insert(node.neighbors, v)
+                        table.insert(v.neighbors, node)
+                        neighborExist = true
+                    end
+                end
+                for i,v in pairs(closedSet) do
+                    if v.position == node.position + Vector3.new(x, y, z) then
+                        table.insert(node.neighbors, v)
+                        table.insert(v.neighbors, node)
+                        neighborExist = true
+                    end
+                end
+                if not neighborExist and not workspace:FindPartOnRayWithIgnoreList(Ray.new(node.position, Vector3.new(x, y, z)), IgnoreWalls) then
+                    local neighbor = Node.new(node.position + Vector3.new(x, y, z))
+                    neighbor.parent = node
+                    table.insert(openSet, neighbor)
+                    table.insert(node.neighbors, neighbor)
+                    table.insert(neighbor.neighbors, node)
+                end
+            end
+            end
+        end
+    end
+    Start = Node.new(StartPos)
+    End = Node.new(EndPos)
+    table.insert(openSet, Start)
+    local start = tick()
+    while #openSet > 0 do
+        local winner = 1
+        for i = 1,#openSet do
+            if openSet[i].F < openSet[winner].F then
+                winner = i
+            end
+        end
+        local current = openSet[winner]
+        if current.H < 10 then
+            print("Found in "..tostring(tick() - start))
+            local waypoints = {}
+            table.insert(waypoints, current.position)
+            while current.parent do
+                table.insert(waypoints, current.parent.position)
+                current = current.parent
+            end
+            return waypoints
+        end
+        table.remove(openSet, winner)
+        table.insert(closedSet, current)
+        Node.addNeighbors(current)
+        for i,v in pairs(current.neighbors) do
+            local neighbor = v
+            if not CheckInclusion(closedSet, neighbor) then
+                local temp_g = current.G + 10
+                if temp_g < neighbor.G then
+                    neighbor.G = temp_g
+                    neighbor.F = neighbor.G + neighbor.H
+                    neighbor.parent = current
+                end
+            end
+        end
+    end
+end
+
+print('Loaded')
+return A_Star
