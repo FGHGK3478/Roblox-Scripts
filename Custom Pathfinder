@@ -57,16 +57,13 @@ function A_Star(StartPos, EndPos, IgnoreWalls, Radius)
             end
         end
     end
-    Start = Node.new(StartPos)
+    Start = Node.new(Vector3.new(math.floor(StartPos.X), math.floor(StartPos.Y), math.floor(StartPos.Z)))
     End = Node.new(EndPos)
     table.insert(openSet, Start)
     local start = tick()
-    local attempts = 0
     while #openSet > 0 do
-
-        attempts = attempts + 1
-        if attempts > 1000 then
-            return {Success = false, Error = "Destination too long"}
+        if tick() - start > 20 then
+            return {Success = false, Error = "Timeout"}
         end
         local winner = 1
         for i = 1,#openSet do
@@ -75,7 +72,7 @@ function A_Star(StartPos, EndPos, IgnoreWalls, Radius)
             end
         end
         local current = openSet[winner]
-        if current.H < Radius then
+        if current.H < Radius and (not workspace:FindPartOnRayWithIgnoreList(Ray.new(current.position, End.position - current.position), IgnoreWalls) or not workspace:FindPartOnRayWithIgnoreList(Ray.new(current.position, End.position - current.position), IgnoreWalls).CanCollide) then
             local reversed_waypoints = {}
             local waypoints = {}
 
@@ -88,7 +85,7 @@ function A_Star(StartPos, EndPos, IgnoreWalls, Radius)
             for i = #reversed_waypoints, 1, -1 do
                 table.insert(waypoints, reversed_waypoints[i])
             end
-            table.remove(waypoints, 1)
+            
             return {Success = true, Waypoints = waypoints}
         end
         table.remove(openSet, winner)
@@ -97,7 +94,7 @@ function A_Star(StartPos, EndPos, IgnoreWalls, Radius)
         for i,v in pairs(current.neighbors) do
             local neighbor = v
             if not CheckInclusion(closedSet, neighbor) then
-                local temp_g = current.G + (Radius - 1)
+                local temp_g = current.G + (Radius - 0.5)
                 
                 if temp_g < neighbor.G then
                     neighbor.G = temp_g
