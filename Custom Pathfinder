@@ -46,7 +46,7 @@ function A_Star(StartPos, EndPos, IgnoreWalls, Radius)
                         neighborExist = true
                     end
                 end
-                if not neighborExist and not workspace:FindPartOnRayWithIgnoreList(Ray.new(node.position, Vector3.new(x, y, z)), IgnoreWalls) then
+                if not neighborExist and (not workspace:FindPartOnRayWithIgnoreList(Ray.new(node.position, Vector3.new(x, y, z)), IgnoreWalls) or not workspace:FindPartOnRayWithIgnoreList(Ray.new(node.position, Vector3.new(x, y, z)), IgnoreWalls).CanCollide) then
                     local neighbor = Node.new(node.position + Vector3.new(x, y, z))
                     neighbor.parent = node
                     table.insert(openSet, neighbor)
