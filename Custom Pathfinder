@@ -94,7 +94,7 @@ function A_Star(StartPos, EndPos, IgnoreWalls, Radius)
         for i,v in pairs(current.neighbors) do
             local neighbor = v
             if not CheckInclusion(closedSet, neighbor) then
-                local temp_g = current.G + math.floor((neighbor.position - current.position).Magnitude)
+                local temp_g = current.G + (Radius - 1)
                 
                 if temp_g < neighbor.G then
                     neighbor.G = temp_g
