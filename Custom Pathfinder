@@ -32,7 +32,7 @@ function A_Star(StartPos, EndPos, IgnoreWalls, IgnoreNonCollide, Radius)
             for y = -Radius,Radius,Radius do
             for z = -Radius,Radius,Radius do
                 local neighborExist = false
-                local blockedObject = workspace:FindPartOnRayWithIgnoreList(Ray.new(node.position, Vector3.new(x, y, z)), IgnoreWalls)
+                local blockedObject, pos = workspace:FindPartOnRayWithIgnoreList(Ray.new(node.position, Vector3.new(x, y, z)), IgnoreWalls)
                 if blockedObject and IgnoreNonCollide and blockedObject.CanCollide == false then
                     blockedObject = nil
                 end
@@ -45,10 +45,8 @@ function A_Star(StartPos, EndPos, IgnoreWalls, IgnoreNonCollide, Radius)
                 end
                 for i,v in pairs(closedSet) do
                     if not blockedObject and v ~= node and v.position == node.position + Vector3.new(x, y, z) then
-                        if not CheckInclusion(node.neighbors, v) then
-                            table.insert(node.neighbors, v)
-                            table.insert(v.neighbors, node)
-                        end
+                        table.insert(node.neighbors, v)
+                        table.insert(v.neighbors, node)
                         neighborExist = true
                     end
                 end
