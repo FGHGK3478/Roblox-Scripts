@@ -1,3 +1,7 @@
+--[[
+    Arguments : Starting Position, End Position, Ignore Walls, Ignore Non-Collide Walls, Radius
+][
+
 function CheckInclusion(tbl, elem)
     for i,v in pairs(tbl) do
         if v == elem then
@@ -37,16 +41,20 @@ function A_Star(StartPos, EndPos, IgnoreWalls, IgnoreNonCollide, Radius)
                     blockedObject = nil
                 end
                 for i,v in pairs(openSet) do
-                    if not blockedObject and v ~= node and v.position == node.position + Vector3.new(x, y, z) then
-                        table.insert(node.neighbors, v)
-                        table.insert(v.neighbors, node)
+                    if not blockedObject and v.position == node.position + Vector3.new(x, y, z) then
+                        if not CheckInclusion(node.neighbors, v) then
+                            table.insert(node.neighbors, v)
+                            table.insert(v.neighbors, node)
+                        end
                         neighborExist = true
                     end
                 end
                 for i,v in pairs(closedSet) do
-                    if not blockedObject and v ~= node and v.position == node.position + Vector3.new(x, y, z) then
-                        table.insert(node.neighbors, v)
-                        table.insert(v.neighbors, node)
+                    if not blockedObject and v.position == node.position + Vector3.new(x, y, z) then
+                        if not CheckInclusion(node.neighbors, v) then
+                            table.insert(node.neighbors, v)
+                            table.insert(v.neighbors, node)
+                        end
                         neighborExist = true
                     end
                 end
@@ -66,7 +74,7 @@ function A_Star(StartPos, EndPos, IgnoreWalls, IgnoreNonCollide, Radius)
     table.insert(openSet, Start)
     local start = tick()
     while #openSet > 0 do
-        if tick() - start > 10 then
+        if tick() - start > 30 then
             return {Success = false, Error = "Timeout"}
         end
         local winner = 1
@@ -80,7 +88,9 @@ function A_Star(StartPos, EndPos, IgnoreWalls, IgnoreNonCollide, Radius)
         if blockedObject and IgnoreNonCollide and blockedObject.CanCollide == false then
             blockedObject = nil
         end
+
         if current.H < 1 and not blockedObject then
+ 
             local reversed_waypoints = {}
             local waypoints = {}
 
