@@ -1,6 +1,6 @@
 --[[
     Arguments : Starting Position, End Position, Ignore Walls, Ignore Non-Collide Walls, Radius
-][
+]]
 
 function CheckInclusion(tbl, elem)
     for i,v in pairs(tbl) do
@@ -79,7 +79,8 @@ function A_Star(StartPos, EndPos, IgnoreWalls, IgnoreNonCollide, Radius)
         end
         local winner = 1
         for i = 1,#openSet do
-            if openSet[i].F < openSet[winner].F then
+            --/ Use h cost instead of f cost which is good in 3d
+            if openSet[i].H < openSet[winner].H then
                 winner = i
             end
         end
