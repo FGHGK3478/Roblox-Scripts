@@ -74,7 +74,7 @@ function A_Star(StartPos, EndPos, IgnoreWalls, IgnoreNonCollide, Radius)
     table.insert(openSet, Start)
     local start = tick()
     while #openSet > 0 do
-        if tick() - start > 30 then
+        if tick() - start > 10 then
             return {Success = false, Error = "Timeout"}
         end
         local winner = 1
