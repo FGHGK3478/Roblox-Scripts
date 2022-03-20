@@ -1,5 +1,9 @@
 --[[
-    Arguments : Starting Position, End Position, Ignore Walls, Ignore Non-Collide Walls, Radius
+    Features  :
+        --/ 3D, 2D Pathfinding
+        --/ Find through parts found ignore list / non-collide wall & part
+        --/ Find in less than a second
+    Arguments : Vector | Starting Position, Vector | End Position, Bool | 2D, Arr | Ignore Walls, Bool | Ignore Non-Collide Walls, Int | Radius
 ]]
 
 function CheckInclusion(tbl, elem)
@@ -11,7 +15,7 @@ function CheckInclusion(tbl, elem)
     return false
 end
 
-function A_Star(StartPos, EndPos, IgnoreWalls, IgnoreNonCollide, Radius)
+function A_Star(StartPos, EndPos, TwoDimension, IgnoreWalls, IgnoreNonCollide, Radius)
     if not IgnoreWalls then
         IgnoreWalls = {}
     end
@@ -35,6 +39,7 @@ function A_Star(StartPos, EndPos, IgnoreWalls, IgnoreNonCollide, Radius)
         for x = -Radius,Radius,Radius do
             for y = -Radius,Radius,Radius do
             for z = -Radius,Radius,Radius do
+                if TwoDimension then y = 0 end
                 local neighborExist = false
                 local blockedObject, pos = workspace:FindPartOnRayWithIgnoreList(Ray.new(node.position, Vector3.new(x, y, z)), IgnoreWalls)
                 if blockedObject and IgnoreNonCollide and blockedObject.CanCollide == false then
@@ -91,14 +96,27 @@ function A_Star(StartPos, EndPos, IgnoreWalls, IgnoreNonCollide, Radius)
 
         if current.H < 1 and not blockedObject then
  
+            --/ Optimize a waypoints
             local reversed_waypoints = {}
             local waypoints = {}
+            local current_waypoint = current
+            local temp_current_waypoint = current
 
-            table.insert(reversed_waypoints, End.position)
-            table.insert(reversed_waypoints, current.position)
-            while current.parent do
-                table.insert(reversed_waypoints, current.parent.position)
-                current = current.parent
+            table.insert(reversed_waypoints, current_waypoint.position)
+
+            while temp_current_waypoint.parent do
+
+                local blockedObject = workspace:FindPartOnRayWithIgnoreList(Ray.new(current_waypoint.position, temp_current_waypoint.parent.position - current_waypoint.position), IgnoreWalls)
+                if blockedObject and IgnoreNonCollide and blockedObject.CanCollide == false then
+                    blockedObject = nil
+                end
+                if blockedObject or temp_current_waypoint.parent == Start then
+                    for lerp = 0, Radius / (current_waypoint.position - (temp_current_waypoint.parent == Start and temp_current_waypoint.parent or temp_current_waypoint).position).Magnitude do
+                        table.insert(reversed_waypoints, CFrame.new(current_waypoint.position):Lerp(CFrame.new(temp_current_waypoint), lerp))
+                    end
+                    current_waypoint = temp_current_waypoint
+                end
+                temp_current_waypoint = temp_current_waypoint.parent
             end
             for i = #reversed_waypoints, 1, -1 do
                 table.insert(waypoints, reversed_waypoints[i])
@@ -123,5 +141,3 @@ function A_Star(StartPos, EndPos, IgnoreWalls, IgnoreNonCollide, Radius)
     end
     return {Success = false, Error = "No open area"}
 end
-
-return A_Star
