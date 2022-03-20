@@ -79,7 +79,7 @@ function A_Star(StartPos, EndPos, IgnoreWalls, IgnoreNonCollide, Radius)
         end
         local winner = 1
         for i = 1,#openSet do
-            if openSet[i].F < openSet[winner].F then
+            if openSet[i].H < openSet[winner].H then
                 winner = i
             end
         end
