@@ -26,7 +26,7 @@ end
 
 --/ Node
 
-function Nodes:New(Pos, startPos, endPoa)
+function Nodes:New(Pos, startPos, endPos, spacing)
 
     Pos = newVec3(floor(Pos.X), floor(Pos.Y), floor(Pos.Z));
     
@@ -104,7 +104,7 @@ end
 
 --/ Implementation
 
-function reconstructPath(currentNode)
+function recontructPath(currentNode)
     local Path = {};
     local tempCurrent = currentNode
     
@@ -116,18 +116,18 @@ function reconstructPath(currentNode)
     return Path;
 end
 
-function pathFinder:setConfiguration(config)
+function pathFinder:SetConfiguration(config)
     Config = config
 end
 
-function pathFinder:FindPath(startPos, endPos, Config)
+function pathFinder:FindPath(startPos, endPos)
     assert(Config, "Please set a configuration first")
-    assert(Config.blacklistparts);
-    assert(Config.dimension);
-    assert(Config.groundlevel);
-    assert(Config.fast);
-    assert(Config.spacing);
-    assert(Config.showNodes);
+    assert(Config.blacklistparts, "Missing blacklistpartsg");
+    assert(Config.dimension, "Missing dimension");
+    assert(Config.groundlevel, "Missing groundlevel");
+    assert(Config.fast "Missing fast");
+    assert(Config.spacing, "Missing spacing");
+    assert(Config.showNodes, "M8ssing showNodes");
     
     local start = tick()
     local startNode = Nodes:New(startPos, startPos, endPos, Config.spacing);
@@ -144,9 +144,9 @@ function pathFinder:FindPath(startPos, endPos, Config)
         insert(closedNodes, nodeWithLowestFCost);
         
         if Distance(nodeWithLowestFCost.Position, endNode.Position) < waypointSpacing then
-            if workspace:FindPartOnRayWithIgnoreList(Ray.new(nodeWithLowestFCost.Position, endNode.Position - nodeWithLowestFCost.Position), Config.blacklistparts) then
+            if workspace:FindPartOnRayWithIgnoreList(Ray.new(nodeWithLowestFCost.Position, endNode.Position - nodeWithLowestFCost.Position), {workspace.Nodes}) then
             --/ Current node is at end node & Path have been found
-                return reconstructPath(nodeWithLowestFCost);
+                return recontructPath(nodeWithLowestFCost);
             end
         end
         
