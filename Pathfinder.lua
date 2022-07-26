@@ -122,12 +122,17 @@ end
 
 function pathFinder:FindPath(startPos, endPos)
     assert(Config, "Please set a configuration first")
-    assert(Config.blacklistparts, "Missing blacklistpartsg");
+    assert(Config.blacklistparts, "Missing blacklistparts");
     assert(Config.dimension, "Missing dimension");
     assert(Config.groundlevel, "Missing groundlevel");
-    assert(Config.fast "Missing fast");
+    assert(Config.fast, "Missing fast");
     assert(Config.spacing, "Missing spacing");
-    assert(Config.showNodes, "M8ssing showNodes");
+    assert(Config.showNodes, "Missing showNodes");
+    
+    if Config.showNodes then
+        Instance.new("Folder", workspace).Name = "Nodes";
+        insert(Config.blacklistparts, workspace.Nodes);
+    end
     
     local start = tick()
     local startNode = Nodes:New(startPos, startPos, endPos, Config.spacing);
@@ -179,4 +184,4 @@ function pathFinder:FindPath(startPos, endPos)
     end
 end
 
-return pathFinder
+return pathFinder;
