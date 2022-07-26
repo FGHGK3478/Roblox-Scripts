@@ -44,7 +44,7 @@ function Nodes:New(Pos, startPos, endPos, spacing)
     gScore[newNode] = 1/0;
     fScore[newNode] = 1/0;
     
-    if Config.showNodes then
+    if Config["showNodes"] then
         newNode.Instance = Instance.new("Part", workspace.Nodes);
         newNode.Instance.Position = newNode.Position
         newNode.Instance.Anchored = true;
@@ -69,16 +69,16 @@ function getNeighbors(node, startPos, endPos, spacing)
             local vec = node.Position + newVec3(x, y, z);
             local existingNeighbor = nil;
             
-            if Config.groundlevel and not workspace:FindPartOnRayWithIgnoreList(Ray.new(vec, newVec3(0, -5, 0)), Config.blacklistparts) then
+            if Config["groundlevel"] and not workspace:FindPartOnRayWithIgnoreList(Ray.new(vec, newVec3(0, -5, 0)), Config["blacklistparts"]) then
                 --/ In air
                 continue;
             end
-            if workspace:FindPartOnRayWithIgnoreList(Ray.new(node.Position, newVec3(x, y, z)), Config.blacklistparts) then
+            if workspace:FindPartOnRayWithIgnoreList(Ray.new(node.Position, newVec3(x, y, z)), Config["blacklistparts"]) then
                 --/ Blocked
                 continue;
             end
 
-            if Config.dimension == "3d" then
+            if Config["dimension"] == "3d" then
                 if Nodes[vec.X] and Nodes[vec.X][vec.Y] and Nodes[vec.X][vec.Y][vec.Z] then
                     existingNeighbor = Nodes[vec.X][vec.Y][vec.Z];
                 end
@@ -91,7 +91,7 @@ function getNeighbors(node, startPos, endPos, spacing)
             if existingNeighbor ~= nil then
                 insert(neighbors, existingNeighbor);
             else
-                local neighbor = Nodes:New(vec, startPos, endPos, Config.spacing);
+                local neighbor = Nodes:New(vec, startPos, endPos);
                 cameFrom[neighbor] = node;
                 insert(neighbors, neighbor);
             end
@@ -122,21 +122,21 @@ end
 
 function pathFinder:FindPath(startPos, endPos)
     assert(Config, "Please set a configuration first")
-    assert(Config.blacklistparts, "Missing blacklistparts");
-    assert(Config.dimension, "Missing dimension");
-    assert(Config.groundlevel, "Missing groundlevel");
-    assert(Config.fast, "Missing fast");
-    assert(Config.spacing, "Missing spacing");
-    assert(Config.showNodes, "Missing showNodes");
+    assert(Config["blacklistparts"] ~= nil, "Missing blacklistparts");
+    assert(Config["dimension"] ~= nil, "Missing dimension");
+    assert(Config["groundlevel"] ~= nil, "Missing groundlevel");
+    assert(Config["fast"] ~= nil, "Missing fast");
+    assert(Config["spacing"] ~= nil, "Missing spacing");
+    assert(Config["showNodes"] ~= nil, "Missing showNodes");
     
-    if Config.showNodes then
+    if Config["showNodes"] then
         Instance.new("Folder", workspace).Name = "Nodes";
-        insert(Config.blacklistparts, workspace.Nodes);
+        insert(Config["blacklistparts"], workspace.Nodes);
     end
     
     local start = tick()
-    local startNode = Nodes:New(startPos, startPos, endPos, Config.spacing);
-    local endNode = Nodes:New(endPos, startPos, endPos, Config.spacing)
+    local startNode = Nodes:New(startPos, startPos, endPos);
+    local endNode = Nodes:New(endPos, startPos, endPos)
     
     gScore[startNode] = 0;
     fScore[startNode] = 0;
@@ -148,7 +148,7 @@ function pathFinder:FindPath(startPos, endPos)
         
         insert(closedNodes, nodeWithLowestFCost);
         
-        if Distance(nodeWithLowestFCost.Position, endNode.Position) < waypointSpacing then
+        if Distance(nodeWithLowestFCost.Position, endNode.Position) < Config["spacing"] then
             if workspace:FindPartOnRayWithIgnoreList(Ray.new(nodeWithLowestFCost.Position, endNode.Position - nodeWithLowestFCost.Position), {workspace.Nodes}) then
             --/ Current node is at end node & Path have been found
                 return recontructPath(nodeWithLowestFCost);
@@ -178,10 +178,10 @@ function pathFinder:FindPath(startPos, endPos)
             return fScore[a] < fScore[b];
         end)
         
-        if Config.fast == false then
+        if Config["fast"] == false then
             task.wait();
         end
     end
 end
 
-return pathFinder;
+return pathFinder
