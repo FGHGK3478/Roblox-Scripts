@@ -96,6 +96,7 @@ function getNeighbors(node, startPos, endPos, spacing)
                 insert(neighbors, neighbor);
             end
         end
+      end
     end
     
     return neighbors;
