@@ -104,7 +104,7 @@ end
 
 --/ Implementation
 
-function recontructPath(currentNode)
+function reconstructPath(currentNode)
     local Path = {};
     local tempCurrent = currentNode
     
@@ -149,13 +149,13 @@ function pathFinder:FindPath(startPos, endPos)
         insert(closedNodes, nodeWithLowestFCost);
         
         if Distance(nodeWithLowestFCost.Position, endNode.Position) < Config["spacing"] then
-            if workspace:FindPartOnRayWithIgnoreList(Ray.new(nodeWithLowestFCost.Position, endNode.Position - nodeWithLowestFCost.Position), {workspace.Nodes}) then
+            if workspace:FindPartOnRayWithIgnoreList(Ray.new(nodeWithLowestFCost.Position, endNode.Position - nodeWithLowestFCost.Position), Config["blacklistparts"]) then
             --/ Current node is at end node & Path have been found
-                return recontructPath(nodeWithLowestFCost);
+                return reconstructPath(nodeWithLowestFCost);
             end
         end
         
-        local Neighbors = getNeighbors(nodeWithLowestFCost, startNode.Position, endNode.Position, waypointSpacing)
+        local Neighbors = getNeighbors(nodeWithLowestFCost, startNode.Position, endNode.Position, Config["spacing"])
         
         for i = 1, #Neighbors do
             local neighbor = Neighbors[i];
