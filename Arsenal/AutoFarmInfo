@@ -1,6 +1,0 @@
-local Info = {
-  Status = "Working";
-  Version = "v1.1";
-}
-
-return Info
