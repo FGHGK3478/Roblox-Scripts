@@ -1,4 +1,4 @@
---/ Scripted by Minhseu123
+--/ Scripted by MinhXD#9978
 --/ This pathfinder uses A Star algorithm. You can learn it from here https://youtu.be/-L-WgKMFuhE
 --/ Feel free to use this but don't forgot to give credits
 
@@ -148,7 +148,7 @@ function pathFinder:SetConfiguration(config)
 end
 
 function pathFinder:FindPath(startPos, endPos)
-    assert(Config and Config["blacklistparts"] ~= nil and Config["dimension"] ~= nil and Config["groundlevel"] ~= nil and Config["fast"] ~= nil and Config["spacing"] ~= nil and Config["showNodes"] ~= nil, "[MinhXD Pathfinder Beta]: Configuration with blacklistparts, dimension, groundlevel, fast, spacing, showNodes expected. Please use :SetConfiguration to set a configuration")
+    assert(Config and Config["blacklistparts"] ~= nil and Config["dimension"] ~= nil and Config["groundlevel"] ~= nil and Config["instant"] ~= nil and Config["spacing"] ~= nil and Config["showNodes"] ~= nil, "[MinhXD Pathfinder Beta]: Configuration with blacklistparts, dimension, groundlevel, instant, spacing, showNodes expected. Please use :SetConfiguration to set a configuration")
     
     if Config["showNodes"] then
         Instance.new("Folder", workspace).Name = "Nodes";
@@ -204,7 +204,7 @@ function pathFinder:FindPath(startPos, endPos)
             return fScore[a] < fScore[b];
         end)
       end
-      if Config["fast"] == false then
+      if Config["instant"] == false then
           task.wait();
       end
     end
