@@ -1,4 +1,4 @@
---/ Scripted by MinhXD#9978
+--/ Scripted by Minhseu123
 --/ This pathfinder uses A Star algorithm. You can learn it from here https://youtu.be/-L-WgKMFuhE
 --/ Feel free to use this but don't forgot to give credits
 
@@ -26,7 +26,7 @@ end
 
 --/ Node
 
-function Nodes:New(Pos, startPos, endPos, spacing)
+function Nodes:New(Pos)
 
     Pos = newVec3(floor(Pos.X), floor(Pos.Y), floor(Pos.Z));
     
@@ -59,46 +59,69 @@ end
 function getNeighbors(node, startPos, endPos, spacing)
     local neighbors = {};
     
-    for x = -spacing, spacing, spacing do
-      for y = -spacing, spacing, spacing do
-        for z = -spacing, spacing, spacing do
-            if dimension == "2d" then
-                y = 0;
-            end
-
-            local vec = node.Position + newVec3(x, y, z);
-            local existingNeighbor = nil;
+    --/ Reduce for loop lags
+    if Config["dimension"]:lower() == "3d" then
+        for x = -spacing, spacing, spacing do
+          for y = -spacing, spacing, spacing do
+            for z = -spacing, spacing, spacing do
+                local vec = node.Position + newVec3(x, y, z);
+                local existingNeighbor = nil;
             
-            if Config["groundlevel"] then
-                if not workspace:FindPartOnRayWithIgnoreList(Ray.new(vec, newVec3(0, -5, 0)), Config["blacklistparts"]) then
-                    --/ In air
+                if Config["groundlevel"] then
+                    if not workspace:FindPartOnRayWithIgnoreList(Ray.new(vec, newVec3(0, -10, 0)), Config["blacklistparts"]) then
+                        --/ In air
+                        continue;
+                    end
+                end
+                if workspace:FindPartOnRayWithIgnoreList(Ray.new(node.Position, newVec3(x, y, z)), Config["blacklistparts"]) then
+                    --/ Blocked
                     continue;
                 end
-            end
-            if workspace:FindPartOnRayWithIgnoreList(Ray.new(node.Position, newVec3(x, y, z)), Config["blacklistparts"]) then
-                --/ Blocked
-                continue;
-            end
 
-            if Config["dimension"] == "3d" then
                 if Nodes[vec.X] and Nodes[vec.X][vec.Y] and Nodes[vec.X][vec.Y][vec.Z] then
                     existingNeighbor = Nodes[vec.X][vec.Y][vec.Z];
                 end
-            else
-                if Nodes[vec.X] and Nodes[vec.X][vec.Z] then
-                    existingNeighbor = Nodes[vec.X][vec.Z];
+
+                if existingNeighbor ~= nil then
+                    insert(neighbors, existingNeighbor);
+                else
+                    local neighbor = Nodes:New(vec);
+                    cameFrom[neighbor] = node;
+                    insert(neighbors, neighbor);
                 end
             end
+          end
+        end
+    else
+        for x = -spacing, spacing, spacing do
+            for z = -spacing, spacing, spacing do
+                local vec = node.Position + newVec3(x, 0, z);
+                local existingNeighbor = nil;
+            
+                if Config["groundlevel"] then
+                    if not workspace:FindPartOnRayWithIgnoreList(Ray.new(vec, newVec3(0, -spacing, 0)), Config["blacklistparts"]) then
+                        --/ In air
+                        continue;
+                    end
+                end
+                if workspace:FindPartOnRayWithIgnoreList(Ray.new(node.Position, newVec3(x, 0, z)), Config["blacklistparts"]) then
+                    --/ Blocked
+                    continue;
+                end
 
-            if existingNeighbor ~= nil then
-                insert(neighbors, existingNeighbor);
-            else
-                local neighbor = Nodes:New(vec, startPos, endPos);
-                cameFrom[neighbor] = node;
-                insert(neighbors, neighbor);
+                if Nodes[vec.X] and Nodes[vec.X][vec.Y] and Nodes[vec.X][vec.Y][vec.Z] then
+                    existingNeighbor = Nodes[vec.X][vec.Y][vec.Z];
+                end
+
+                if existingNeighbor ~= nil then
+                    insert(neighbors, existingNeighbor);
+                else
+                    local neighbor = Nodes:New(vec);
+                    cameFrom[neighbor] = node;
+                    insert(neighbors, neighbor);
+                end
             end
         end
-      end
     end
     
     return neighbors;
@@ -119,17 +142,13 @@ function reconstructPath(currentNode)
 end
 
 function pathFinder:SetConfiguration(config)
+    assert(type(config) == "table", ("[MinhXD Pathfinder Beta]: Cannot set a configuration. table expected got %s"):format(type(config)))
+    
     Config = config
 end
 
 function pathFinder:FindPath(startPos, endPos)
-    assert(Config, "Please set a configuration first")
-    assert(Config["blacklistparts"] ~= nil, "Missing blacklistparts");
-    assert(Config["dimension"] ~= nil, "Missing dimension");
-    assert(Config["groundlevel"] ~= nil, "Missing groundlevel");
-    assert(Config["fast"] ~= nil, "Missing fast");
-    assert(Config["spacing"] ~= nil, "Missing spacing");
-    assert(Config["showNodes"] ~= nil, "Missing showNodes");
+    assert(Config and Config["blacklistparts"] ~= nil and Config["dimension"] ~= nil and Config["groundlevel"] ~= nil and Config["fast"] ~= nil and Config["spacing"] ~= nil and Config["showNodes"] ~= nil, "[MinhXD Pathfinder Beta]: Configuration with blacklistparts, dimension, groundlevel, fast, spacing, showNodes expected. Please use :SetConfiguration to set a configuration")
     
     if Config["showNodes"] then
         Instance.new("Folder", workspace).Name = "Nodes";
@@ -146,12 +165,17 @@ function pathFinder:FindPath(startPos, endPos)
     insert(openNodes, startNode);
     
     while #openNodes > 0 do
+      for increasement = 1,10 do
+        if tick() - start > 30 then
+            error("[MinhXD Pathfinder Beta]: Timed out")
+        end
+
         local nodeWithLowestFCost = table.remove(openNodes, 1);
         
         insert(closedNodes, nodeWithLowestFCost);
         
         if Distance(nodeWithLowestFCost.Position, endNode.Position) < Config["spacing"] then
-            if workspace:FindPartOnRayWithIgnoreList(Ray.new(nodeWithLowestFCost.Position, endNode.Position - nodeWithLowestFCost.Position), Config["blacklistparts"]) then
+            if not workspace:FindPartOnRayWithIgnoreList(Ray.new(nodeWithLowestFCost.Position, endNode.Position - nodeWithLowestFCost.Position), Config["blacklistparts"]) then
             --/ Current node is at end node & Path have been found
                 return reconstructPath(nodeWithLowestFCost);
             end
@@ -161,7 +185,7 @@ function pathFinder:FindPath(startPos, endPos)
         
         for i = 1, #Neighbors do
             local neighbor = Neighbors[i];
-            local tempG = gScore[nodeWithLowestFCost] + Distance(nodeWithLowestFCost.Position, neighbor.Position) - 5;
+            local tempG = gScore[nodeWithLowestFCost] + Distance(nodeWithLowestFCost.Position, neighbor.Position) - 1;
 
             if not table.find(closedNodes, neighbor) then
                 if tempG < gScore[neighbor] or not table.find(openNodes, neighbor) then
@@ -179,10 +203,10 @@ function pathFinder:FindPath(startPos, endPos)
         table.sort(openNodes, function(a,b)
             return fScore[a] < fScore[b];
         end)
-        
-        if Config["fast"] == false then
-            task.wait();
-        end
+      end
+      if Config["fast"] == false then
+          task.wait();
+      end
     end
 end
 
