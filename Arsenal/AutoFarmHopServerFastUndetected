@@ -1,0 +1,125 @@
+if not game:IsLoaded() then
+    game.Loaded:Wait()
+end
+
+if not game:GetService("Players").LocalPlayer:FindFirstChild("DataLoaded") then
+	repeat wait(5) until game:GetService("Players").LocalPlayer:FindFirstChild("DataLoaded")
+end
+
+if not getgc then
+    getgc = getreg or debug.getregistry
+end
+
+for i,v in pairs(getconnections(game:GetService("ScriptContext").Error)) do
+    v:Disable()
+end
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local ReplicatedStorage = game.ReplicatedStorage
+local wkspc = ReplicatedStorage.wkspc
+local firebullet = (function(gc)
+    for i,v in pairs(gc) do
+        if type(v) == "function" and islclosure(v) and getinfo(v).name == "firebullet" then
+            return v
+        end
+    end
+end)(getgc())
+
+function getClosestPlayer()
+    local closestDistance = math.huge
+    local closestPlayer = nil
+    local players = Players:GetPlayers()
+
+    for i = 1, #players do
+        local player = players[i]
+        if player.Team ~= LocalPlayer.Team and player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player.Character:FindFirstChild("Spawned") then
+            if (player.Character.HumanoidRootPart.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude < closestDistance then
+                closestDistance = (player.Character.HumanoidRootPart.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
+                closestPlayer = player
+            end
+        end
+    end
+
+    return closestPlayer
+end
+
+function Deploy()
+    local gui = LocalPlayer.PlayerGui.GUI
+    local buttons = gui.TeamSelection.Buttons
+    for i,v in pairs({"Blu", "Rd", "Ylw", "Grn"}) do
+        if not buttons[v].lock.Visible then
+            firesignal(buttons[v].MouseButton1Down)
+            break
+        end
+    end
+    gui.Parent.Menew.Enabled = false
+    gui.Enabled = true
+    gui.TeamSelection.Visible = false
+    gui.BottomFrame.Visible = false
+    gui.Interface.Visible = true
+    gui.Parent.MapVoting.MapVote.Visible = false
+end
+
+
+if LocalPlayer.Character.LowerTorso:FindFirstChild("Root") then
+    LocalPlayer.Character.LowerTorso.Root:Destroy()
+end
+
+LocalPlayer.Character.UpperTorso.Anchored = true
+LocalPlayer.Character.HumanoidRootPart.Anchored = true
+LocalPlayer.PlayerGui.GUI.Main.Chats.Visible = false
+LocalPlayer.CameraMode = Enum.CameraMode.Classic
+LocalPlayer.CameraMinZoomDistance = 8
+LocalPlayer.CameraMaxZoomDistance = 8
+wkspc.CurrentCurse.Value = "Infinite Ammo"
+getsenv(LocalPlayer.PlayerGui.GUI.Client.Functions.Weapons).ShakeCam = function() end
+
+old = hookmetamethod(game, "__newindex", function(self, key, value)
+    if self == LocalPlayer and key == "CameraMode" then
+        return old(self, key, Enum.CameraMode.Classic)
+    end
+    return old(self, key, value)
+end)
+
+old2 = hookmetamethod(game, "__namecall", function(self, ...)
+	local args = {...}
+	local method = getnamecallmethod()
+	if method == "FindPartOnRayWithIgnoreList" and not checkcaller() then
+		local ignoreList = args[2]
+		table.insert(ignoreList, workspace.Map)
+	end
+
+	return old2(self, table.unpack(args))
+end)
+
+
+while true do
+    if wkspc.Status.RoundOver.Value then
+        break
+    end
+
+    if LocalPlayer.Status.Team.Value == "Spectator" then Deploy() wait(2) end
+
+    task.wait()
+
+    local closestPlayer = getClosestPlayer{}
+    if closestPlayer then
+        while not wkspc.Status.RoundOver.Value and LocalPlayer.Status.Team.Value ~= "Spectator" and LocalPlayer.NRPBS.Health.Value > 0 and closestPlayer and closestPlayer.Character and closestPlayer.Character:FindFirstChild('HumanoidRootPart') and closestPlayer.Character:FindFirstChild('Spawned') and LocalPlayer.Team ~= closestPlayer.Team do
+            LocalPlayer.Character.HumanoidRootPart.CFrame = closestPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 2)
+            workspace.Camera.CameraSubject = closestPlayer.Character.Head
+            spawn(firebullet)
+            game.RunService.Stepped:Wait()
+        end
+		if LocalPlayer.NRPBS.Health.Value <= 0 then
+			ReplicatedStorage.Events.LoadCharacter:FireServer()
+		end
+    end
+end
+
+Site = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. game.PlaceId .. '/servers/Public?limit=100'))
+for i,v in pairs(Site.data) do
+    if tonumber(v.maxPlayers) > tonumber(v.playing) then
+        game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, v.id)
+    end
+end
