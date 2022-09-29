@@ -39,8 +39,8 @@ getgenv().current = game.ReplicatedStorage.DefaultChatSystemChatEvents.OnMessage
         return
     end
 
-    if (slashtoresponse and msg:sub(1, 6) == "/botin" or slashtoresponse == false) then
-        if slashtoresponse then
+    if (slashtorespond and msg:sub(1, 6) == "/botin" or slashtorespond == false) then
+        if slashtorespond then
             msg = msg:sub(8, #msg)
         end
         if not recognized[plr.Name] then
