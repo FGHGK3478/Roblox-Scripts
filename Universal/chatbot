@@ -2,7 +2,11 @@ function say(msg)
     game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(msg, "All")
 end
 
-if slashtoresponse then
+if current and type(current.Disconnect) == "function" then
+	current:Disconnect()
+end
+
+if slashtorespond then
     say("Chatbot loaded. Say /botin [msg] to chat with a bot")
 end
 
@@ -20,12 +24,12 @@ end
 
 local recognized = {}
 
-pipe = game.ReplicatedStorage.DefaultChatSystemChatEvents.OnMessageDoneFiltering.OnClientEvent:Connect(function(msgg)
+getgenv().current = game.ReplicatedStorage.DefaultChatSystemChatEvents.OnMessageDoneFiltering.OnClientEvent:Connect(function(msgg)
     local msg = msgg.Message
     local plr = game.Players[msgg.FromSpeaker]
     
     if msg:sub(1, 13) == "/chatbot stop" then
-        pipe:Disconnect()
+        current:Disconnect()
         return
     end
     if plr == game.Players.LocalPlayer or not plr.Character or not plr.Character:FindFirstChild("HumanoidRootPart") then
