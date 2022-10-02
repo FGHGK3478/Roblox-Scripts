@@ -369,15 +369,15 @@ NewTab.TextSize = 14.000
 
 -- Scripts:
 
-local function JXZHEJM_fake_script() -- WindowTab.WindowTab 
+local function EUQVUYQ_fake_script() -- WindowTab.WindowTab 
 	local script = Instance.new('LocalScript', WindowTab)
 
 	local close = script.Parent.Close
 	local minimized = script.Parent.Minimize
 	local title = script.Parent.Title
-	local version = "v2.16.6c"
+	local version = game.HttpService:JSONDecode(game:HttpGet("https://api.whatexploitsare.online/status"))[1].Synapse.exploit_version
 	
-	script.Parent.Version.Value = version
+	_G.version = version
 	
 	close.MouseButton1Click:Connect(function()
 		script.Parent.Parent.Parent:Destroy()
@@ -392,7 +392,7 @@ local function JXZHEJM_fake_script() -- WindowTab.WindowTab
 		end
 		title.Text = ""
 		wait(0.5)
-		for s in string.gmatch("Synapse X - "..version, ".") do
+		for s in string.gmatch("Synapse X - ".._G.version, ".") do
 			if not script.Parent.Parent.Parent.Enabled then
 				title.Text = ""
 				break
@@ -411,8 +411,8 @@ local function JXZHEJM_fake_script() -- WindowTab.WindowTab
 	
 	playAnim()
 end
-coroutine.wrap(JXZHEJM_fake_script)()
-local function QNPCOQ_fake_script() -- Panel.Panel 
+coroutine.wrap(EUQVUYQ_fake_script)()
+local function LVWGQV_fake_script() -- Panel.Panel 
 	local script = Instance.new('LocalScript', Panel)
 
 	local attach = script.Parent.Attach
@@ -424,14 +424,13 @@ local function QNPCOQ_fake_script() -- Panel.Panel
 	local savefile = script.Parent.SaveFile
 	local scripthub = script.Parent.ScriptHub
 	local window = script.Parent.Parent
-	local version = window.WindowTab.Version.Value
 	
 	local injected = false
 	
 	local function setStatus(data, time)
-		window.WindowTab.Title.Text = "Synapse X - "..version.." ("..data..")"
+		window.WindowTab.Title.Text = "Synapse X - ".._G.version.." ("..data..")"
 		wait(time)
-		window.WindowTab.Title.Text = "Synapse X - "..version
+		window.WindowTab.Title.Text = "Synapse X - ".._G.version
 	end
 	
 	attach.MouseButton1Click:Connect(function()
@@ -458,8 +457,8 @@ local function QNPCOQ_fake_script() -- Panel.Panel
 		loadstring(window.Editor.ScrollingFrame.ScriptEditor.Text)()
 	end)
 end
-coroutine.wrap(QNPCOQ_fake_script)()
-local function MDIZ_fake_script() -- ScrollingFrame.LinesCounter 
+coroutine.wrap(LVWGQV_fake_script)()
+local function UZVHOVN_fake_script() -- ScrollingFrame.LinesCounter 
 	local script = Instance.new('LocalScript', ScrollingFrame)
 
 	local scrollingframe = script.Parent
@@ -493,9 +492,9 @@ local function MDIZ_fake_script() -- ScrollingFrame.LinesCounter
 		linecursor.Position = UDim2.new(0, 0, 0, cursorYPosition)
 	end)
 end
-coroutine.wrap(MDIZ_fake_script)()
+coroutine.wrap(UZVHOVN_fake_script)()
 -- ScrollingFrame.SyntaxHighlighting is disabled.
-local function UUDQ_fake_script() -- Tabs.Tabs 
+local function QQFYV_fake_script() -- Tabs.Tabs 
 	local script = Instance.new('LocalScript', Tabs)
 
 	local currentTab
@@ -619,4 +618,4 @@ local function UUDQ_fake_script() -- Tabs.Tabs
 		currentTab.Script.Value = script.Parent.Parent.ScrollingFrame.ScriptEditor.Text
 	end)
 end
-coroutine.wrap(UUDQ_fake_script)()
+coroutine.wrap(QQFYV_fake_script)()
