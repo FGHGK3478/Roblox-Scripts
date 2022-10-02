@@ -44,7 +44,7 @@ local NewTab = Instance.new("TextButton")
 --Properties:
 
 SynapseX.Name = "SynapseX"
-SynapseX.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+SynapseX.Parent = gethui()
 SynapseX.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 MainWindow.Name = "MainWindow"
