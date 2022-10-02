@@ -1,6 +1,7 @@
 --[[
 Originally created by MinWasTaken#2873.
 Syntax highlighting & some other features are not yet completed. Please wait and always run this script via loadstring to stay up-to-date.
+Press F7 to minimize & unminimize the GUI
 <3.
 ]]
 
