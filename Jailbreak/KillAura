@@ -2,13 +2,15 @@ local old = require(game:GetService("ReplicatedStorage").Module.RayCast).RayIgno
 
 local function getNearestEnemy()
     local nearestDistance, nearestEnemy = 600, nil
+    local myTeam = tostring(game:GetService("Players").LocalPlayer.Team)
     for i,v in pairs(game:GetService("Players"):GetPlayers()) do
-	    	 if v.Team ~= game:GetService("Players").LocalPlayer.Team and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
-	    	     if (v.Character.HumanoidRootPart.Position - game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position).Magnitude < nearestDistance then
-	    	         nearestDistance, nearestEnemy = (v.Character.HumanoidRootPart.Position - game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position).Magnitude, v
-	    	     end
-	    	 end
-	  end
+        local theirTeam = tostring(v.Team)
+	    if ((myTeam == "Police" and theirTeam == "Criminal") or theirTeam == "Police") and theirTeam ~= myTeam and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+	    	if (v.Character.HumanoidRootPart.Position - game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position).Magnitude < nearestDistance then
+	    	    nearestDistance, nearestEnemy = (v.Character.HumanoidRootPart.Position - game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position).Magnitude, v
+	    	end
+	    end
+	end
     return nearestEnemy
 end
 local function shoot()
@@ -18,22 +20,30 @@ local function shoot()
     game:GetService("VirtualInputManager"):SendMouseButtonEvent(x, y, 0, false, game, 1)
 end
 while wait(0.5) do
+	if not game:GetService("Players").LocalPlayer.Character then continue end
+	if not game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then continue end
+	
     local nearestEnemy = getNearestEnemy()
     if nearestEnemy then
         require(game:GetService("ReplicatedStorage").Module.RayCast).RayIgnoreNonCollideWithIgnoreList = function(...)
-	          local arg = {old(...)}
-	          if (tostring(getfenv(2).script) == "BulletEmitter" or tostring(getfenv(2).script) == "Taser") then
-		            arg[1] = nearestEnemy.Character.HumanoidRootPart
-		            arg[2] = nearestEnemy.Character.HumanoidRootPart.Position
-		        end
-	          return unpack(arg)
-	      end
-        while nearestEnemy and nearestEnemy.Character and (nearestEnemy.Character.HumanoidRootPart.Position - game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position).Magnitude < 600 and nearestEnemy.Character.Humanoid.Health > 0 do
-            game:GetService("Players").LocalPlayer.Folder.Pistol.InventoryEquipRemote:FireServer(true)
-            shoot()
-            wait()
-        end
-        game:GetService("Players").LocalPlayer.Folder.Pistol.InventoryEquipRemote:FireServer(false)
+	        local arg = {old(...)}
+	        if (tostring(getfenv(2).script) == "BulletEmitter" or tostring(getfenv(2).script) == "Taser") then
+		          arg[1] = nearestEnemy.Character.HumanoidRootPart
+		          arg[2] = nearestEnemy.Character.HumanoidRootPart.Position
+		      end
+	        return unpack(arg)
+	    end
+	    if not game:GetService("Players").LocalPlayer.Folder:FindFirstChild("Pistol") then
+	        fireclickdetector(workspace.Givers:GetChildren()[17].ClickDetector)
+	    end
+	    if game:GetService("Players").LocalPlayer.Folder:FindFirstChild("Pistol") then
+	        while nearestEnemy and nearestEnemy.Character and nearestEnemy.Character:FindFirstChild("HumanoidRootPart") and (nearestEnemy.Character.HumanoidRootPart.Position - game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position).Magnitude < 600 and nearestEnemy.Character.Humanoid.Health > 0 do
+	            game:GetService("Players").LocalPlayer.Folder.Pistol.InventoryEquipRemote:FireServer(true)
+	            wait()
+	            shoot()
+	        end
+	        game:GetService("Players").LocalPlayer.Folder.Pistol.InventoryEquipRemote:FireServer(false)
+	    end
     else
         require(game:GetService("ReplicatedStorage").Module.RayCast).RayIgnoreNonCollideWithIgnoreList = old
     end
