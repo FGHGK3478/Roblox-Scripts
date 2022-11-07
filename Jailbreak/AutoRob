@@ -1,3 +1,5 @@
+getgenv().autorob = true
+
 local Services = setmetatable({}, {
     __index = function(_, service)
         if ypcall(function()game:GetService(service)end) then
@@ -20,6 +22,7 @@ local RobberyConsts = require(Services.ReplicatedStorage.Game.Robbery.RobberyCon
 local Puzzle = getupvalue(require(Services.ReplicatedStorage.Game.Robbery.PuzzleFlow).Init, 3)
 local RobberyState = Services.ReplicatedStorage.RobberyState
 local Jewelry = workspace.Jewelrys:GetChildren()[1]
+local Bank = workspace.Banks:GetChildren()[1]
 local attemptPunch = getupvalue(require(Services.ReplicatedStorage.Game.DefaultActions).punchButton.onPressed, 1).attemptPunch
 local Stepped = {}
 
@@ -69,7 +72,7 @@ end
 
 function rayCast(Pos, Dir)
 	local raycastParams = RaycastParams.new()
-	raycastParams.FilterDescendantsInstances = {workspace:FindFirstChild("Rain"), workspace.Vehicles}
+	raycastParams.FilterDescendantsInstances = {workspace:FindFirstChild("Rain"), workspace.Vehicles, workspace.VehicleSpawns, workspace.Trains, workspace:FindFirstChild("MinWasTaken#2873")}
 	raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
 	return workspace:Raycast(Pos, Dir, raycastParams)
 end
@@ -183,7 +186,6 @@ function teleport(Destination, Mode, Speed)
         until (Destination - Root.Position).Magnitude < 5
     elseif Mode == "path" then
         for i,v in pairs(Destination) do
-			print(type(v))
             teleport((type(v) == "userdata" and v.Position or v) + Vector3.new(0, 3, 0), "linear", Speed or 2)
         end
     end
@@ -191,6 +193,7 @@ function teleport(Destination, Mode, Speed)
 end
 
 function findEnterVehicle()
+if Character:FindFirstChild("InVehicle") then return end
 	local nearestSpawn = getNearestSpawn()
     local nearestVehicle = getNearestVehicle()
 	local distanceToSpawn = (nearestSpawn.Region.Position - Root.Position).Magnitude
@@ -241,7 +244,7 @@ function findEnterVehicle()
 end
 
 function Escape()
-	if not rayCast(Root.Position, Vector3.new(0, 1000, 0)) then return end
+	if not rayCast(Character.Head.Position + Vector3.new(0, 3, 0), Vector3.new(0, 1000, 0)) then return end
     local escapePath = FindEscape()
     if escapePath then
         teleport(escapePath, "path")
@@ -309,21 +312,37 @@ local Robbery = {
 }
 
 for i, robberyState in pairs(RobberyState:GetChildren()) do
-    for i2, robberyData in pairs(Robbery) do
+    for k, robberyData in pairs(Robbery) do
         if robberyState.Name == tostring(robberyData.id) then
             --[1 = Open, 2 = Store is in robbery, 3 = Closed
-            robberyData.Open = (robberyState.Value ~= 3)
+            robberyData.Open = ((k == "Museum" or k == "Tomb") and robberyState.Value == 2) or (not (k == "Museum" or k == "Tomb") and robberyState.Value ~= 3)
             robberyState:GetPropertyChangedSignal("Value"):Connect(function()
-                robberyData.Open = (robberyState.Value ~= 3)
+                robberyData.Open = ((k == "Museum" or k == "Tomb") and robberyState.Value == 2) or (not (k == "Museum" or k == "Tomb") and robberyState.Value ~= 3)
             end)
             break
         end
     end
 end
+RobberyState.ChildAdded:Connect(function(robberyState)
+	for k, robberyData in pairs(Robbery) do
+        if robberyState.Name == tostring(robberyData.id) then
+            --[1 = Open, 2 = Store is in robbery, 3 = Closed
+            robberyData.Open = ((k == "Museum" or k == "Tomb") and robberyState.Value == 2) or (not (k == "Museum" or k == "Tomb") and robberyState.Value ~= 3)
+            robberyState:GetPropertyChangedSignal("Value"):Connect(function()
+                robberyData.Open = ((k == "Museum" or k == "Tomb") and robberyState.Value == 2) or (not (k == "Museum" or k == "Tomb") and robberyState.Value ~= 3)
+            end)
+            break
+        end
+    end
+end)
 
 require(Services.ReplicatedStorage.Game.Paraglide).IsFlying = function()
     return tostring(getfenv(2).script) == "Falling"
 end
+local safePlatform = workspace:FindFirstChild("MinWasTaken#2873") or Instance.new("Part", workspace)
+safePlatform.Name = "MinWasTaken#2873"
+safePlatform.Anchored = true
+safePlatform.Size = Vector3.new(300, 1, 300)
 
 function isBagFull()
     if not LocalPlayer.PlayerGui.RobberyMoneyGui.Enabled then
@@ -353,7 +372,40 @@ function attemptSell()
 		wait(1)
 		teleport(Vector3.new(2227, 19, -2455), "linear")
 		teleport(Vector3.new(2280, 23, -2064), "linear")
-	until powerplant and not LocalPlayer.PlayerGui:FindFirstChild("PowerPlantRobberyGui") or not isBagFull()
+	until (powerplant and not LocalPlayer.PlayerGui:FindFirstChild("PowerPlantRobberyGui")) or (not powerplant and not isBagFull())
+end
+
+function robBank()
+	Escape()
+	teleport(Vector3.new(-15, 22, 869), "vehicle")
+	wait(0.5)
+	attemptJump()
+	Root.CFrame = CFrame.new(-3, 22, 867)
+	wait(0.5)
+	teleport(Vector3.new(27, 22, 860), "linear", 2)
+	teleport(Vector3.new(40, 22, 926), "linear")
+	repeat wait() until #workspace.Ringers.Bank:GetChildren() > 0
+	local layout = Bank.Layout:GetChildren()[1]
+	if layout:FindFirstChild("Lasers") then
+		layout.Lasers:Destroy()
+	end
+	firesignal(layout.TriggerDoor.Touched)
+	layout.TriggerDoor.CanCollide = false
+	local PathToVault = PathFind(Root.Position, layout.Money.Position)
+	if PathToVault then
+		teleport(PathToVault, "path")
+		Root.Anchored = true
+	end
+	repeat wait() until isBagFull() or Robbery.Bank.Open == false
+	Root.Anchored = false
+	if isBagFull() then
+		for i = #PathToVault, 1, -1 do
+			teleport(PathToVault[i].Position + Vector3.new(0, 3, 0), "linear", 2)
+		end
+		teleport(Vector3.new(40, 22, 926), "linear")
+		teleport(Vector3.new(27, 22, 860), "linear", 2)
+	end
+	Robbery.Bank.Open = false
 end
 
 function robJewelry()
@@ -369,28 +421,30 @@ function robJewelry()
     teleport(Vector3.new(137, 19, 1347), "linear", 4)
     teleport(Vector3.new(135, 18, 1336), "linear", 2)
     local boxes = Jewelry.Boxes:GetChildren()
-    table.sort(boxes, function(a, b)
-        return a.Position.Y < b.Position.Y and (Vector3.new(a.Position.X, 0, a.Position.Z) - Vector3.new(Root.Position.X, 0, Root.Position.Z)).Magnitude < (Vector3.new(b.Position.X, 0, b.Position.Z) - Vector3.new(Root.Position.X, 0, Root.Position.Z)).Magnitude
-    end)
-    for i,box in pairs(boxes) do
-        if isBagFull() or Robbery.Jewelry.Open == false then
-            break
+	while not isBagFull() and Robbery.Jewelry.Open do
+        table.sort(boxes, function(a, b)
+		    return (a.Position - Root.Position).Magnitude < (b.Position - Root.Position).Magnitude and a.Position.Y < 21 and a.Transparency < 0.9
+	    end)
+		local box
+		for i,v in pairs(boxes) do
+			if v.Transparency < 0.9 then
+				box = v
+				break
+			end
+		end
+        local PathToBox = PathFind(Root.Position, box.Position + box.CFrame.LookVector * 2.5)
+        if PathToBox then
+            teleport(PathToBox, "path")
+            Root.CFrame = CFrame.new(Root.Position, box.Position)
         end
-        if box.Transparency < 0.9 then
-            local PathToBox = PathFind(Root.Position, box.Position + box.CFrame.LookVector * 2.5)
-            if PathToBox then
-                teleport(PathToBox, "path")
-                Root.CFrame = CFrame.new(Root.Position, box.Position)
+        for i = 1, 8 do
+            attemptPunch()
+            wait(0.5)
+            if box.Transparency > 0.9 then
+                break
             end
-            for i = 1, 5 do
-                attemptPunch()
-                wait(0.5)
-                if box.Transparency > 0.9 then
-                    break
-                end
-            end
-			Root.Anchored = false
         end
+		Root.Anchored = false
     end
     if isBagFull() then
         local PathToExit = PathFind(Root.Position, Vector3.new(126, 118, 1285))
@@ -402,8 +456,8 @@ function robJewelry()
             teleport(Vector3.new(-247, 18, 1616), "above")
 			wait(1)
         until not isBagFull()
-		Robbery.Jewelry.Open = false
     end
+	Robbery.Jewelry.Open = false
 end 
 
 function robPower()
@@ -496,22 +550,26 @@ function robPower()
     teleport(Vector3.new(60, 24, 2300), "linear", 4)
 	if LocalPlayer.PlayerGui:FindFirstChild("PowerPlantRobberyGui") then
 		attemptSell()
-		Robbery.PowerPlant.Open = false
 	end
+	Robbery.PowerPlant.Open = false
 end
 function robPassenger()
-	local briefcaseCount = 0
+	Escape()
+	if tostring(LocalPlayer.Team) == "Prisoner" then
+		teleport(Vector3.new(-1151, 19, -1392), "above")
+		wait(0.5)
+	end
 	for i,v in pairs(Specs) do
-        if v.Name == "Grab briefcase" then
+        if v.Name == "Grab briefcase" and workspace.Trains.SteamEngine:IsAncestorOf(v.Part) then
+			if isBagFull() then break end
             v:Callback(true)
-			briefcaseCount += 1
-			wait()
+			wait(0.5)
         end
     end
-	if isBagFull() or (LocalPlayer.PlayerGui.RobberyMoneyGui.Enabled and briefcaseCount == 0) then
+	if isBagFull() then
 		attemptSell()
-		Robbery.NightTrain.Open = false
 	end
+	Robbery.NightTrain.Open = false
 end
 function robPlane()
 	Escape()
@@ -543,10 +601,10 @@ function robPlane()
 			teleport(Vector3.new(-342, 26, 2015), "vehicle")
 			wait(20)
 			teleport(Vector3.new(-342, 26, 2051), "vehicle")
-			wait(1)
+			wait(2)
 		until not isBagFull()
-		Robbery.Plane.Open = false
 	end
+	Robbery.CargoPlane.Open = false
 end
 
 function robDonut()
@@ -555,6 +613,7 @@ function robDonut()
 	wait(0.5)
 	attemptJump()
 	Root.CFrame = CFrame.new(121, 20, -1632)
+	wait(0.5)
 	teleport(Vector3.new(109, 22, -1587), "linear")
 	teleport(Vector3.new(85, 20, -1596), "linear", 2)
 	connectStep("dontmove", function()
@@ -580,6 +639,7 @@ function robGas()
 	wait(0.5)
 	attemptJump()
 	Root.CFrame = CFrame.new(-1629, 20, 694)
+	wait(0.5)
 	teleport(Vector3.new(-1611, 20, 690), "linear")
 	teleport(Vector3.new(-1600, 18, 684), "linear", 2)
 	connectStep("dontmove", function()
@@ -599,20 +659,105 @@ function robGas()
 	Robbery.Gas.Open = false
 end
 
+function robTrain()
+	Escape()
+	local BoxCar = workspace.Trains:WaitForChild("BoxCar", 2873)
+	if BoxCar then
+		local Vault = BoxCar.Model.Rob.Gold
+		repeat
+			if Character:FindFirstChild("InVehicle") then
+                local currentVehicle = GetLocalVehiclePacket().Model
+				local root = currentVehicle.PrimaryPart
+                local BV = Create("BodyVelocity", root, {
+                    Velocity = Vector3.new(),
+                    MaxForce = Vector3.new(1,1,1) * 9e9
+                })
+				local Y = math.random(300, 400)
+                repeat
+                    if not Character:FindFirstChild("InVehicle") then
+                        break
+                    end
+                	local Dir = (Vector3.new(Vault.Position.X, Y, Vault.Position.Z) - Vector3.new(root.Position.X, Y, root.Position.Z))
+                    root.CFrame = CFrame.new(root.Position.X, Y, root.Position.Z) + (Dir.Unit * 11)
+                    wait()
+                until not rayCast(Vault.Position, Vector3.new(0, Y-10, 0)) and (Vector3.new(Vault.Position.X, Y, Vault.Position.Z) - Vector3.new(root.Position.X, Y, root.Position.Z)).Magnitude < 11
+                root.CFrame = CFrame.new(Vault.Position + Vector3.new(0, 3, 0))
+				BV:Destroy()
+            else
+                findEnterVehicle()
+            end
+		until (Vault.Position - Root.Position).Magnitude < 20
+		for i,v in pairs(Specs) do
+			if v.Name == "Open Door" and BoxCar:IsAncestorOf(v.Part) then
+				v:Callback(true)
+				break
+			end
+		end
+		for i,v in pairs(Specs) do
+			if v.Name == "Breach Vault" and BoxCar:IsAncestorOf(v.Part) then
+				v:Callback(true)
+				break
+			end
+		end
+		connectStep("vaulttp", function()
+			if Character:FindFirstChild("InVehicle") then
+				GetLocalVehiclePacket().Model:SetPrimaryPartCFrame(CFrame.new(Vault.Position + Vector3.new(0, 3, 0)))
+			else
+				Root.CFrame = CFrame.new(Vault.Position + Vector3.new(0, 3, 0))
+			end
+		end)
+		attemptJump()
+		repeat wait() until isBagFull() or Character:FindFirstChild("Handcuffs") or (Vector3.new(-1662, 42, 267) - Vault.Position).Magnitude < 20
+		disconnectStep("vaulttp")
+	end
+	Robbery.CargoTrain.Open = false
+end
+
+function robMsm()
+	Escape()
+	teleport(Vector3.new(1056, 106, 1247), "vehicle")
+	wait(0.5)
+	attemptJump()
+	teleport(Vector3.new(1080, 109, 1266), "linear")
+	teleport(Vector3.new(1127, 110, 1304), "linear")
+	for i,v in pairs(Specs) do
+		if v.Name:match("Grab Bone") then
+			v:Callback(true)
+			wait(0.5)
+			if isBagFull() then break end
+		end
+	end
+	teleport(Vector3.new(1127, 110, 1304), "linear")
+	teleport(Vector3.new(1056, 106, 1247), "linear")
+	if isBagFull() then
+		attemptSell()
+	end
+	Robbery.Museum.Open = false
+end
+
 while getgenv().autorob do
-	if Robbery.Jewelry.Open then
-		robJewelry()
-	elseif Robbery.PowerPlant.Open then
+	if Robbery.PowerPlant.Open then
 		robPower()
+	elseif Robbery.Museum.Open then
+		print(pcall(robMsm))
+	elseif Robbery.Jewelry.Open then
+		robJewelry()
+	elseif Robbery.CargoPlane.Open and workspace.Plane.PrimaryPart.Position.Y > 200 and workspace.Plane:FindFirstChild("Crates").Crate1['1'].Transparency < 1 then
+		robPlane()
+	elseif Robbery.CargoTrain.Open then
+		robTrain()
 	elseif Robbery.NightTrain.Open then
 		robPassenger()
-	elseif Robbery.CargoPlane.Open and workspace.Plane.PrimaryPart.Position.Y > 110 and #workspace.Plane:FindFirstChild("Crates"):GetChildren() > 0 then
-		robPlane()
 	elseif Robbery.Donut.Open then
 		robDonut()
 	elseif Robbery.Gas.Open then
-		robJewelry()
+		robGas()
 	else
-		wait(0.5)
+		Escape()
+		findEnterVehicle()
+		safePlatform.Position = Vector3.new(Root.Position.X, 300, Root.Position.Z)
+		GetLocalVehiclePacket().Model:SetPrimaryPartCFrame(CFrame.new(Root.Position.X, 305, Root.Position.Z))
+		repeat wait()
+		until Robbery.PowerPlant.Open or Robbery.Jewelry.Open or (Robbery.CargoPlane.Open and workspace.Plane.PrimaryPart.Position.Y > 200 and workspace.Plane:FindFirstChild("Crates").Crate1['1'].Transparency < 1) or Robbery.CargoTrain.Open or Robbery.NightTrain.Open or Robbery.Donut.Open or Robbery.Gas.Open or not getgenv().autorob
 	end
 end
