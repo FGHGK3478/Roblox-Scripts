@@ -1,0 +1,10 @@
+return {
+    ["Free"] = {
+        Version = "v1.1",
+        Changelogs = "• Fixed For New Winter Update"
+    },
+    ["Paid"] = {
+        Version = "v1.5",
+        Changelogs = "• Fixed For New Winter Update"
+    }
+}
