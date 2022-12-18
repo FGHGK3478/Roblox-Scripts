@@ -4,8 +4,8 @@ return {
         Changelog = "\n• Fixed 20 seconds cooldown"
     },
     ["Paid"] = {
-        Version = "v1.5",
-        Changelog = "\n• Fixed For New Winter Update\n• Fixed Teleport Glitching When Died"
+        Version = "v1.6",
+        Changelog = "\n• Added Entering Volcano with Vehicle\n• New Instant Escape\n• Fixed KillAura Keep Equipping Pistol When Punching Box in Jewelry\n• Max Vehicle Teleport Speed Increased To 20\n• Max Player Teleport Speed Increased To 5.5\n• Faster Car Spawning\n• Resolve PowerPlant Puzzle When Failed"
     },
     ["Undetected"] = {
         Version = "v1.0",
