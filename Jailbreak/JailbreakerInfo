@@ -5,7 +5,7 @@ return {
     },
     ["Paid"] = {
         Version = "v1.6",
-        Changelog = "\n• Added Entering Volcano with Vehicle\n• New Instant Escape\n• Fixed KillAura Keep Equipping Pistol When Punching Box in Jewelry\n• Max Vehicle Teleport Speed Increased To 20\n• Max Player Teleport Speed Increased To 5.5\n• Faster Car Spawning\n• Resolve PowerPlant Puzzle When Failed"
+        Changelog = "test"
     },
     ["Undetected"] = {
         Version = "v1.0",
