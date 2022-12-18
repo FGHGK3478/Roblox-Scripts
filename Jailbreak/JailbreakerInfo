@@ -1,14 +1,14 @@
 return {
     ["Free"] = {
-        Version = "v1.1",
-        Changelog = "• Fixed For New Winter Update\n• Fixed Teleport Glitching When Died"
+        Version = "v1.2",
+        Changelog = "\n• Fixed 20 seconds cooldown"
     },
     ["Paid"] = {
         Version = "v1.5",
-        Changelog = "• Fixed For New Winter Update\n• Fixed Teleport Glitching When Died"
+        Changelog = "\n• Fixed For New Winter Update\n• Fixed Teleport Glitching When Died"
     },
     ["Undetected"] = {
         Version = "v1.0",
-        Changelog = "• Released"
+        Changelog = "\n• Released"
     }
 }
